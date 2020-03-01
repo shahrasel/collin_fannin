@@ -1,0 +1,299 @@
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>ItemDetails</key>
+        <dict>
+            <key>id</key>
+            <string>12</string>
+            <key>mls_number</key>
+            <string>C5102294</string>
+            <key>community_status</key>
+            <string>Active</string>
+            <key>market</key>
+            <string>Dallas-Fort Worth</string>
+            <key>community_name</key>
+            <string>Timber Oaks Townhomes</string>
+            <key>existing_community</key>
+            <string>null</string>
+            <key>community_desc</key>
+            <string>Timber Oaks Townhomes is centrally in the heart of Garland, Texas with one of the best rated school districts in the state. Priced to sell quickly, these custom 2 story - 4 bedroom, 3 bathroom townhomes are not far from major shopping districts. Only 5 mins from Firewheel Mall and 10 mins from the Rockwall Harbor, you and your family will have plenty of activities to choose from. As a huge bonus, these townhomes are only 2 mins away from Lake Ray Hubbard where you can enjoy fishing, boating, jet skiing and even para-sailing. Come tour Timber Oaks Townhomes and site-see for yourself. We guarantee you won't find a better location with amenties fit for an adventure seeking family.</string>
+            <key>inhouse_mort_int_rate</key>
+            <string>3.985</string>
+            <key>special_offers</key>
+            <string />
+            <key>association_type</key>
+            <string>Mandatory</string>
+            <key>association_fee_frequency</key>
+            <string>Monthly</string>
+            <key>association_fee</key>
+            <string>35</string>
+            <key>association_fee_includes</key>
+            <string>null</string>
+            <key>address</key>
+            <string>1910 Timber Oaks Drive</string>
+            <key>price</key>
+            <string>$220,900 - $229,950</string>
+            <key>bed</key>
+            <string>3 - 4</string>
+            <key>bath</key>
+            <string>2 - 3</string>
+            <key>garage</key>
+            <string>2</string>
+            <key>sqft</key>
+            <string>1,759 - 1,948</string>
+            <key>sqft_per_dollar</key>
+            <string>$118 - $125</string>
+            <key>is_openhouse</key>
+            <string>No</string>
+            <key>openhouse_date</key>
+            <string />
+            <key>custom_tag</key>
+            <string />
+            <key>openhouse_timed</key>
+            <string>-</string>
+            <key>openhouse_time</key>
+            <string>Tue, Nov 12,  -</string>
+            <key>total_images</key>
+            <string>2</string>
+            <key>total_images</key>
+            <string>2</string>
+            <key>total_new_homes</key>
+            <string>0</string>
+            <key>no_floor_plans</key>
+            <string>1</string>
+            <key>total_quick_movein</key>
+            <string>1</string>
+            <key>total_luxury_homes</key>
+            <string>0</string>
+            <key>total_floor_plans</key>
+            <string>1</string>
+            <key>new_homes_image</key>
+            <string />
+            <key>quick_movein_image</key>
+            <string>http://buildentory.com/media/property/21/0012.jpg</string>
+            <key>luxury_homes_image</key>
+            <string />
+            <key>floor_plan_image</key>
+            <string>http://buildentory.com/media/property/27/2TimberOaksTownhomespic.jpg</string>
+            <key>new_homes_price_range</key>
+            <string>$0</string>
+            <key>quick_movein_price_range</key>
+            <string>$229,950</string>
+            <key>luxury_homes_price_range</key>
+            <string>$0</string>
+            <key>floor_plan_price_range</key>
+            <string>$220,900</string>
+            <key>mortgage_payment_per_month</key>
+            <string>$2,540</string>
+            <key>video_url</key>
+            <string>https://youtu.be/ZQzkcUhwYKs</string>
+            <key>unit_number</key>
+            <string />
+            <key>country_parish</key>
+            <string>Dallas</string>
+            <key>city</key>
+            <string>Garland</string>
+            <key>state</key>
+            <string>TX</string>
+            <key>postal_code</key>
+            <string>75040</string>
+            <key>postal_code_plus</key>
+            <string />
+            <key>lot_number</key>
+            <string />
+            <key>block</key>
+            <string />
+            <key>mls_area_major</key>
+            <string />
+            <key>mls_area_minor</key>
+            <string />
+            <key>planned_development</key>
+            <string />
+            <key>latitude</key>
+            <string>32.8979519</string>
+            <key>longitude</key>
+            <string>-96.602798</string>
+            <key>financing_proposed</key>
+            <string>["Cash","Contact Agent","Conventional"]</string>
+            <key>brochure_pdf_url</key>
+            <string>https://buildentory.com/media/brochure/5b48efbc01f11_dummy_pdf.pdf</string>
+            <key>school_district</key>
+            <string />
+            <key>primary_school_name</key>
+            <string />
+            <key>elementary_school_name</key>
+            <string />
+            <key>middle_school_name</key>
+            <string />
+            <key>intermediate_school_name</key>
+            <string />
+            <key>junior_high_school_name</key>
+            <string />
+            <key>high_school_name</key>
+            <string />
+            <key>senior_high_school_name</key>
+            <string />
+            <key>community_features</key>
+            <string>Comm. Sprinkler System, Nature Areas, Views</string>
+            <key>special_notes</key>
+            <string>Build to Suit</string>
+            <key>energy_saving_features</key>
+            <string>Drought Tolerant Plants</string>
+            <key>green_building_certification</key>
+            <string />
+            <key>green_energy_efficient</key>
+            <string>12-15 SEER AC, Ceiling Fans, Electric Water Heater, Low E Window</string>
+            <key>utilities</key>
+            <string>Alley, City Sewer, City Water, Sidewalk, Underground Utilities</string>
+            <key>municiple_utility_district</key>
+            <string>YES</string>
+            <key>builder_info</key>
+            <dict>
+                <key>builder_name</key>
+                <string>Brennan Tucker Homes</string>
+                <key>builder_logo</key>
+                <string>http://www.buildentory.com/media/builders/company_logo/5bef15e3eaeb5_BrennanTucker_web_logo.jpg</string>
+                <key>builder_address</key>
+                <string />
+                <key>builder_city</key>
+                <string />
+                <key>builder_state</key>
+                <string />
+                <key>builder_zip</key>
+                <string />
+                <key>builder_call</key>
+                <string>(214) 514-5255</string>
+                <key>builder_text</key>
+                <string>(214) 514-5255</string>
+                <key>builder_email</key>
+                <string>dave@tapdfw.com</string>
+                <key>builder_open_house_time</key>
+                <dict>
+                    <key>Saturday</key>
+                    <string>09:00 AM-07:00 PM</string>
+                    <key>Sunday</key>
+                    <string>10:00 AM-06:00 PM</string>
+                    <key>Monday</key>
+                    <string>09:00 AM-05:00 PM</string>
+                    <key>Tuesday</key>
+                    <string>09:00 AM-05:00 PM</string>
+                    <key>Thursday</key>
+                    <string>09:00 AM-05:00 PM</string>
+                    <key>Friday</key>
+                    <string>09:00 AM-05:00 PM</string>
+                </dict>
+            </dict>
+            <key>photo</key>
+            <array>
+                <dict>
+                    <key>image_portrait</key>
+                    <string>TimberOaksBillboard41.jpg</string>
+                    <key>image_portrait_url</key>
+                    <string>http://buildentory.com/media/community/12/TimberOaksBillboard41.jpg</string>
+                    <key>image_portrait_thumb</key>
+                    <string>TimberOaksBillboard41.jpg</string>
+                    <key>image_portrait_url_thumb</key>
+                    <string>http://buildentory.com/media/community/12/TimberOaksBillboard41.jpg</string>
+                </dict>
+                <dict>
+                    <key>image_portrait</key>
+                    <string>TimberOaksBillboard1.jpg</string>
+                    <key>image_portrait_url</key>
+                    <string>http://buildentory.com/media/community/12/TimberOaksBillboard1.jpg</string>
+                    <key>image_portrait_thumb</key>
+                    <string>TimberOaksBillboard1.jpg</string>
+                    <key>image_portrait_url_thumb</key>
+                    <string>http://buildentory.com/media/community/12/TimberOaksBillboard1.jpg</string>
+                </dict>
+            </array>
+            <key>created</key>
+            <string>1503412174</string>
+            <key>updated</key>
+            <string>1538593562</string>
+        </dict>
+        <key>builder_section_info</key>
+        <dict>
+            <key>id</key>
+            <string>13</string>
+        </dict>
+        <key>ask_an_expert_user</key>
+        <dict>
+            <key>id</key>
+            <string>13</string>
+            <key>table_name</key>
+            <string>builders</string>
+            <key>name</key>
+            <string>David Tucker</string>
+            <key>image</key>
+            <string>http://www.buildentory.com/media/builders/5bb51423a8bff_IMG_4977.JPG</string>
+            <key>title</key>
+            <string>Broker</string>
+            <key>company</key>
+            <string>Brennan Tucker Homes</string>
+            <key>cell</key>
+            <string />
+            <key>text</key>
+            <string>(214) 514-5255</string>
+            <key>email</key>
+            <string>dave@tapdfw.com</string>
+            <key>latitude</key>
+            <string />
+            <key>longitude</key>
+            <string />
+        </dict>
+        <key>1st section user</key>
+        <dict>
+            <key>id</key>
+            <string>13</string>
+            <key>table_name</key>
+            <string>builders</string>
+            <key>name</key>
+            <string>David Tucker</string>
+            <key>image</key>
+            <string>http://www.buildentory.com/media/builders/5bb51423a8bff_IMG_4977.JPG</string>
+            <key>title</key>
+            <string>Broker</string>
+            <key>company</key>
+            <string>Brennan Tucker Homes</string>
+            <key>cell</key>
+            <string />
+            <key>text</key>
+            <string>(214) 514-5255</string>
+            <key>email</key>
+            <string>dave@tapdfw.com</string>
+            <key>latitude</key>
+            <string />
+            <key>longitude</key>
+            <string />
+        </dict>
+        <key>2nd section user</key>
+        <dict>
+            <key>id</key>
+            <string>18</string>
+            <key>name</key>
+            <string>Tom Fitch</string>
+            <key>image</key>
+            <string>http://buildentory.com/media/lenders/5ac16b1af3f8c_Man-in-suit2.jpg</string>
+            <key>nmls</key>
+            <string>1389741</string>
+            <key>title</key>
+            <string>Loan Officer</string>
+            <key>company</key>
+            <string>First United Bank</string>
+            <key>cell</key>
+            <string>(214) 673-8467</string>
+            <key>text</key>
+            <string>4699395929</string>
+            <key>email</key>
+            <string>eileen.flusche@firstunitedbank.com</string>
+            <key>sales_info</key>
+            <string />
+            <key>longitude</key>
+            <string />
+        </dict>
+    </dict>
+</plist>
+
