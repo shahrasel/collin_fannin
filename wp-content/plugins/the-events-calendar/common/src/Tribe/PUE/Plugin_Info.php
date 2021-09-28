@@ -41,6 +41,10 @@ if ( ! class_exists( 'Tribe__PUE__Plugin_Info' ) ) {
 		public $downloaded;
 		public $last_updated;
 
+		public $api_expired;
+		public $api_invalid;
+		public $api_upgrade;
+
 		public $id = 0; // The native WP.org API returns numeric plugin IDs, but they're not used for anything.
 
 		/**
@@ -53,6 +57,12 @@ if ( ! class_exists( 'Tribe__PUE__Plugin_Info' ) ) {
 		 */
 		public static function from_json( $json ) {
 			$apiResponse = json_decode( $json );
+
+			// Get first item of the response array
+			if ( $apiResponse && ! empty( $apiResponse->results ) ) {
+				$apiResponse = current( $apiResponse->results );
+			}
+
 			if ( empty( $apiResponse ) || ! is_object( $apiResponse ) ) {
 				return null;
 			}
@@ -83,8 +93,7 @@ if ( ! class_exists( 'Tribe__PUE__Plugin_Info' ) ) {
 
 			// The custom update API is built so that many fields have the same name and format
 			// as those returned by the native WordPress.org API. These can be assigned directly.
-
-			$sameFormat = array(
+			$sameFormat = [
 				'name',
 				'slug',
 				'version',
@@ -96,7 +105,11 @@ if ( ! class_exists( 'Tribe__PUE__Plugin_Info' ) ) {
 				'downloaded',
 				'homepage',
 				'last_updated',
-			);
+				'api_expired',
+				'api_upgrade',
+				'api_invalid',
+			];
+
 			foreach ( $sameFormat as $field ) {
 				if ( isset( $this->$field ) ) {
 					$info->$field = $this->$field;
@@ -119,7 +132,7 @@ if ( ! class_exists( 'Tribe__PUE__Plugin_Info' ) ) {
 			} elseif ( is_array( $this->sections ) ) {
 				$info->sections = $this->sections;
 			} else {
-				$info->sections = array( 'description' => '' );
+				$info->sections = [ 'description' => '' ];
 			}
 
 			return $info;

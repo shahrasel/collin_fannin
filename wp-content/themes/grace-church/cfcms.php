@@ -22,7 +22,7 @@ if(!empty($_GET['id'])) {
           <div class="vc_row wpb_row vc_row-fluid">
             <div class="wpb_column vc_column_container vc_col-sm-4 vc_custom_1442222777601">
               <div class="wpb_wrapper">
-                <div class="figure sc_image  sc_image_shape_square"><img src="<?php if(!empty($cfcms_info['image'])): ?><?php echo $cfcms_info['image']; else: ?>https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>" alt="" style="width:200px"></div>
+                <div class="figure sc_image  sc_image_shape_square"><img src="<?php if(!empty($cfcms_info['image'])): ?><?php echo $cfcms_info['image']; else: ?>https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>" alt="" style="width:200px"></div>
               </div>
             </div>
             <div class="wpb_column vc_column_container vc_col-sm-8 vc_custom_1442222637897">

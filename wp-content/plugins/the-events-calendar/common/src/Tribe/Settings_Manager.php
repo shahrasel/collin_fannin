@@ -1,6 +1,7 @@
 <?php
-
 class Tribe__Settings_Manager {
+	const OPTION_CACHE_VAR_NAME = 'Tribe__Settings_Manager:option_cache';
+
 	protected static $network_options;
 	public static $tribe_events_mu_defaults;
 
@@ -12,7 +13,7 @@ class Tribe__Settings_Manager {
 
 		// Load multisite defaults
 		if ( is_multisite() ) {
-			$tribe_events_mu_defaults = array();
+			$tribe_events_mu_defaults = [];
 			if ( file_exists( WP_CONTENT_DIR . '/tribe-events-mu-defaults.php' ) ) {
 				require_once WP_CONTENT_DIR . '/tribe-events-mu-defaults.php';
 			}
@@ -22,14 +23,35 @@ class Tribe__Settings_Manager {
 
 	public function add_hooks() {
 		// option pages
-		add_action( '_network_admin_menu', array( $this, 'init_options' ) );
-		add_action( '_admin_menu', array( $this, 'init_options' ) );
+		add_action( '_network_admin_menu', [ $this, 'init_options' ] );
+		add_action( '_admin_menu', [ $this, 'init_options' ] );
 
-		add_action( 'admin_menu', array( $this, 'add_help_admin_menu_item' ), 50 );
-		add_action( 'tribe_settings_do_tabs', array( $this, 'do_setting_tabs' ) );
-		add_action( 'tribe_settings_do_tabs', array( $this, 'do_network_settings_tab' ), 400 );
-		add_action( 'tribe_settings_content_tab_help', array( $this, 'do_help_tab' ) );
-		add_action( 'tribe_settings_validate_tab_network', array( $this, 'save_all_tabs_hidden' ) );
+		add_action( 'admin_menu', [ $this, 'add_help_admin_menu_item' ], 50 );
+		add_action( 'tribe_settings_do_tabs', [ $this, 'do_setting_tabs' ] );
+		add_action( 'tribe_settings_do_tabs', [ $this, 'do_network_settings_tab' ], 400 );
+		add_action( 'tribe_settings_validate_tab_network', [ $this, 'save_all_tabs_hidden' ] );
+		add_action( 'updated_option', [ $this, 'update_options_cache' ], 10, 3 );
+	}
+
+	/**
+	 * For performance reasons our options are saved in memory, but we need to make sure we update it when WordPress
+	 * updates the variable directly.
+	 *
+	 * @since 4.11.0
+	 *
+	 * @param string $option    Name of the updated option.
+	 * @param mixed  $old_value The old option value.
+	 * @param mixed  $value     The new option value.
+	 *
+	 * @return void
+	 */
+	public function update_options_cache( $option, $old_value, $value ) {
+		// Bail when no our option.
+		if ( Tribe__Main::OPTIONNAME !== $option ) {
+			return;
+		}
+
+		tribe_set_var( self::OPTION_CACHE_VAR_NAME, $value );
 	}
 
 	/**
@@ -47,6 +69,9 @@ class Tribe__Settings_Manager {
 	 * @return void
 	 */
 	public function do_setting_tabs() {
+		// Make sure Thickbox is available regardless of which admin page we're on
+		add_thickbox();
+
 		include_once Tribe__Main::instance()->plugin_path . 'src/admin-views/tribe-options-general.php';
 		include_once Tribe__Main::instance()->plugin_path . 'src/admin-views/tribe-options-display.php';
 
@@ -56,15 +81,6 @@ class Tribe__Settings_Manager {
 		new Tribe__Settings_Tab( 'display', esc_html__( 'Display', 'tribe-common' ), $displayTab );
 
 		$this->do_licenses_tab();
-
-		new Tribe__Settings_Tab(
-			'help',
-			esc_html__( 'Help', 'tribe-common' ),
-			array(
-				'priority'  => 60,
-				'show_save' => false,
-			)
-		);
 	}
 
 	/**
@@ -73,11 +89,14 @@ class Tribe__Settings_Manager {
 	 * @return array of options
 	 */
 	public static function get_options() {
-		$options = get_option( Tribe__Main::OPTIONNAME, array() );
-		if ( has_filter( 'tribe_get_options' ) ) {
-			_deprecated_function( 'tribe_get_options', '3.10', 'option_' . Tribe__Main::OPTIONNAME );
-			$options = apply_filters( 'tribe_get_options', $options );
-		}
+		$options = tribe_get_var( self::OPTION_CACHE_VAR_NAME, [] );
+
+		if ( empty( $options ) ) {
+			$options = (array) get_option( Tribe__Main::OPTIONNAME, [] );
+
+			tribe_set_var( self::OPTION_CACHE_VAR_NAME, $options );
+ 		}
+
 		return $options;
 	}
 
@@ -93,10 +112,10 @@ class Tribe__Settings_Manager {
 		if ( ! $option_name ) {
 			return null;
 		}
-		$options = self::get_options();
+		$options = static::get_options();
 
 		$option = $default;
-		if ( isset( $options[ $option_name ] ) ) {
+		if ( array_key_exists( $option_name, $options ) ) {
 			$option = $options[ $option_name ];
 		} elseif ( is_multisite() && isset( self::$tribe_events_mu_defaults ) && is_array( self::$tribe_events_mu_defaults ) && in_array( $option_name, array_keys( self::$tribe_events_mu_defaults ) ) ) {
 			$option = self::$tribe_events_mu_defaults[ $option_name ];
@@ -111,16 +130,22 @@ class Tribe__Settings_Manager {
 	 * @param array $options formatted the same as from get_options()
 	 * @param bool  $apply_filters
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function set_options( $options, $apply_filters = true ) {
 		if ( ! is_array( $options ) ) {
-			return;
+			return false;
 		}
-		if ( $apply_filters == true ) {
+		if ( true === $apply_filters ) {
 			$options = apply_filters( 'tribe-events-save-options', $options );
 		}
-		update_option( Tribe__Main::OPTIONNAME, $options );
+		$updated = update_option( Tribe__Main::OPTIONNAME, $options );
+
+		if ( $updated ) {
+			tribe_set_var( self::OPTION_CACHE_VAR_NAME, $options );
+		}
+
+		return $updated;
 	}
 
 	/**
@@ -129,13 +154,13 @@ class Tribe__Settings_Manager {
 	 * @param string $name
 	 * @param mixed  $value
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function set_option( $name, $value ) {
-		$newOption        = array();
-		$newOption[ $name ] = $value;
 		$options          = self::get_options();
-		self::set_options( wp_parse_args( $newOption, $options ) );
+		$options[ $name ] = $value;
+
+		return self::set_options( $options );
 	}
 
 	/**
@@ -146,7 +171,7 @@ class Tribe__Settings_Manager {
 	 */
 	public static function get_network_options() {
 		if ( ! isset( self::$network_options ) ) {
-			$options              = get_site_option( Tribe__Main::OPTIONNAMENETWORK, array() );
+			$options               = get_site_option( Tribe__Main::OPTIONNAMENETWORK, [] );
 			self::$network_options = apply_filters( 'tribe_get_network_options', $options );
 		}
 
@@ -191,11 +216,11 @@ class Tribe__Settings_Manager {
 		if ( ! is_array( $options ) ) {
 			return;
 		}
+
 		if ( $apply_filters == true ) {
 			$options = apply_filters( 'tribe-events-save-network-options', $options );
 		}
 
-		// @TODO use getNetworkOptions + force
 		if ( update_site_option( Tribe__Main::OPTIONNAMENETWORK, $options ) ) {
 			self::$network_options = apply_filters( 'tribe_get_network_options', $options );
 		} else {
@@ -211,10 +236,15 @@ class Tribe__Settings_Manager {
 	public static function add_network_options_page() {
 		$tribe_settings = Tribe__Settings::instance();
 		add_submenu_page(
-			'settings.php', $tribe_settings->menuName, $tribe_settings->menuName, 'manage_network_options', 'tribe-common', array(
+			'settings.php',
+			$tribe_settings->menuName,
+			$tribe_settings->menuName,
+			'manage_network_options',
+			'tribe-common',
+			[
 				$tribe_settings,
 				'generatePage',
-			)
+			]
 		);
 	}
 
@@ -234,12 +264,12 @@ class Tribe__Settings_Manager {
 	 * only if premium addons are detected.
 	 */
 	protected function do_licenses_tab() {
-		$show_tab = ( current_user_can( 'update_plugins' ) && $this->have_addons() );
+		$show_tab = ( current_user_can( 'activate_plugins' ) && $this->have_addons() );
 
 		/**
 		 * Provides an oppotunity to override the decision to show or hide the licenses tab
 		 *
-		 * Normally it will only show if the current user has the "update_plugins" capability
+		 * Normally it will only show if the current user has the "activate_plugins" capability
 		 * and there are some currently-activated premium plugins.
 		 *
 		 * @var bool
@@ -260,17 +290,21 @@ class Tribe__Settings_Manager {
 		 */
 		$license_fields = apply_filters( 'tribe_license_fields', $licenses_tab );
 
-		new Tribe__Settings_Tab( 'licenses', esc_html__( 'Licenses', 'tribe-common' ), array(
+		new Tribe__Settings_Tab( 'licenses', esc_html__( 'Licenses', 'tribe-common' ), [
 			'priority'      => '40',
 			'fields'        => $license_fields,
 			'network_admin' => is_network_admin() ? true : false,
-		) );
+		] );
 	}
 
 	/**
 	 * Create the help tab
 	 */
 	public function do_help_tab() {
+		/**
+		 * Include Help tab Assets here
+		 */
+
 		include_once Tribe__Main::instance()->plugin_path . 'src/admin-views/tribe-options-help.php';
 	}
 
@@ -280,26 +314,16 @@ class Tribe__Settings_Manager {
 	 * @todo move to an admin class
 	 */
 	public function add_help_admin_menu_item() {
-		$hidden_settings_tabs = self::get_network_option( 'hideSettingsTabs', array() );
+		$hidden_settings_tabs = self::get_network_option( 'hideSettingsTabs', [] );
 		if ( in_array( 'help', $hidden_settings_tabs ) ) {
 			return;
 		}
 
-		$parent = Tribe__Settings::$parent_slug;
+		$parent = class_exists( 'Tribe__Events__Main' ) ? Tribe__Settings::$parent_page : Tribe__Settings::$parent_slug;
 		$title  = esc_html__( 'Help', 'tribe-common' );
-		$slug   = esc_url(
-			apply_filters( 'tribe_settings_url',
-				add_query_arg(
-					array(
-						'page'      => 'tribe-common',
-						'tab'       => 'help',
-					),
-					Tribe__Settings::$parent_page
-				)
-			)
-		);
+		$slug   = 'tribe-help';
 
-		add_submenu_page( $parent, $title, $title, 'manage_options', $slug, '' );
+		add_submenu_page( $parent, $title, $title, 'manage_options', $slug, [ $this, 'do_help_tab' ] );
 	}
 
 	/**
@@ -308,7 +332,8 @@ class Tribe__Settings_Manager {
 	 * @return bool
 	 */
 	protected function have_addons() {
-		$addons = apply_filters( 'tribe_licensable_addons', array() );
+		$addons = apply_filters( 'tribe_licensable_addons', [] );
+
 		return ! empty( $addons );
 	}
 
@@ -318,7 +343,7 @@ class Tribe__Settings_Manager {
 	 * @return void
 	 */
 	public function save_all_tabs_hidden() {
-		$all_tabs_keys = array_keys( apply_filters( 'tribe_settings_all_tabs', array() ) );
+		$all_tabs_keys = array_keys( apply_filters( 'tribe_settings_all_tabs', [] ) );
 
 		$network_options = (array) get_site_option( Tribe__Main::OPTIONNAMENETWORK );
 
@@ -337,13 +362,6 @@ class Tribe__Settings_Manager {
 	 * @return Tribe__Settings_Manager
 	 */
 	public static function instance() {
-		static $instance;
-
-		if ( ! $instance ) {
-			$class_name = __CLASS__;
-			$instance = new $class_name;
-		}
-
-		return $instance;
+		return tribe( 'settings.manager' );
 	}
 }

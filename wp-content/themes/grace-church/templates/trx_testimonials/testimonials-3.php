@@ -76,8 +76,9 @@ if ( !function_exists( 'grace_church_template_testimonials_3_output' ) ) {
                             //echo get_field( "select_doctor" );
                             global $wpdb;
                             //echo "select * from ".$wpdb->prefix."cfcms_directory where id='".get_field( "select_doctor" )."'";
-                            $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
-                            $project_lists = $mydb->get_results("select * from ".$wpdb->prefix."cfcms_directory where id='".get_field( "select_doctor" )."' limit 1",'ARRAY_A');
+                            $mydb = new wpdb('collinorg_user','^8faX99z','collinorg','localhost:8888');
+                            //$mydb = new wpdb('root','root','collin','localhost:8888');
+                            $project_lists = $mydb->get_results("select * from ".$wpdb->prefix."bestof_reviews where id='".get_field( "select_doctor" )."' limit 1",'ARRAY_A');
 
                             //print_r($project_lists);
                         ?>

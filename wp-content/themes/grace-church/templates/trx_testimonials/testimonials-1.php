@@ -76,16 +76,18 @@ if ( !function_exists( 'grace_church_template_testimonials_1_output' ) ) {
                     <?php
                     //echo get_field( "select_doctor" );
                     global $wpdb;
+                    $mydb = new wpdb('collinorg_user','^8faX99z','collinorg','localhost:8888');
+                    //$mydb = new wpdb('root','root','collin','localhost:8888');
                     //echo "select * from ".$wpdb->prefix."cfcms_directory where id='".get_field( "select_doctor" )."'";
 
-                    $project_lists = $wpdb->get_results("select * from ".$wpdb->prefix."cfcms_directory where id='".get_field( "select_doctor" )."' limit 1",'ARRAY_A');
+                    $project_lists = $wpdb->get_results("select * from ".$wpdb->prefix."bestof_reviews where id='".get_field( "select_doctor" )."' limit 1",'ARRAY_A');
 
                     //print_r($project_lists);
                     ?>
-                    <img src="<?php echo $project_lists[0][image]; ?>" style="border-radius:50%;max-width: 150px">
-                    <h5 style="margin-top: 0.3em;font-size: 1.366rem"><?php echo $project_lists[0][name] ?></h5>
-                    <p style="margin-bottom: 0px;"><i><?php echo $project_lists[0][specialty] ?></i></p>
-                    <p><?php echo $project_lists[0][office_city ].($project_lists[0][office_state ]?', '.$project_lists[0][office_state ]:'') ?></p>
+                    <img src="<?php echo $project_lists[0]['image']; ?>" style="border-radius:50%;max-width: 150px">
+                    <h5 style="margin-top: 0.3em;font-size: 1.366rem"><?php echo $project_lists[0]['fname'].' '.$project_lists[0]['lname'] ?></h5>
+                    <p style="margin-bottom: 0px;"><i><?php echo implode(', ',json_decode($project_lists[0]['cat_list'])) ?></i></p>
+                    <p><?php echo $project_lists[0]['office_city'].($project_lists[0]['office_state']?', '.$project_lists[0]['office_state']:'') ?></p>
                 </div>
             </div>
         </div>

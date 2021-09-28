@@ -1,9 +1,11 @@
-<div id="popup_login" class="popup_wrap popup_login bg_tint_light" style="width:17.5em">
+<div id="popup_login" class="popup_wrap popup_login bg_tint_light" style="width:30.5em">
 	<a href="#" class="popup_close"></a>
+    <p style="display: none;color: #ff0000" id="login_failed">Sorry for the inconvenience. You are currently not a member of the Collin-Fannin County Medical Society.<br/>To join: <a style="color: #0000ff;font-size: 15px;" href="https://collinfannincms.org/wp-content/themes/grace-church/CFCMS%20Membership%20Application%202018.pdf" target="_blank">Click here</a><br/>To renew: <a style="color: #0000ff;font-size: 15px;" href="https://www.texmed.org/Login.aspx?ReturnUrl=%2fDues%2fInvoice.aspx" target="_blank">Click here</a></p>
+    <p style="display: none;color: #ff0000" id="password_failed">You have entered the wrong password. Please enter your correct password or reset your password by clicking <a style="color: #0000ff;font-size: 15px;" href="https://collinfannincms.org/forgot-password/" target="_blank">here</a></p>
 	<div class="form_wrap">
 		<div class="form_left" style="border:none;width:100%;padding-right:0px;">
 			<!--<form action="<?php echo wp_login_url(); ?>" method="post" name="login_form" class="popup_form login_form">-->
-            <form action="" method="post" name="login_form" class="popup_form">
+            <form method="post" name="login_form" class="popup_form" id="login_form" action="">
 				<input type="hidden" name="redirect_to" value="<?php echo esc_attr(home_url('/')); ?>">
 				<div class="popup_form_field login_field iconed_field icon-user"><input type="text" id="log" name="log" value="" placeholder="<?php esc_html_e('Email', 'grace-church'); ?>" required="required"></div>
 				<div class="popup_form_field password_field iconed_field icon-lock"><input type="password" id="password" name="pwd" value="" placeholder="<?php esc_html_e('Password', 'grace-church'); ?>" required="required"></div>
@@ -14,7 +16,7 @@
 				</div>
                 <input type="hidden" name="is_loggedin" value="1" />
 				<div class="popup_form_field submit_field">
-                	<input type="submit" class="submit_button" value="<?php esc_html_e('Login', 'grace-church'); ?>" style="margin-bottom:10px">
+                	<input type="submit" class="submit_button" id="submit_button" value="<?php esc_html_e('Login', 'grace-church'); ?>" style="margin-bottom:10px">
   					<a href="<?php echo site_url() ?>/forgot-password/" style="color:#000">Forgot Password</a>
                 </div>
 			</form>

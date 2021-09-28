@@ -271,7 +271,7 @@ h6 {
 	border-color: #20c7ca;
 }
 .scheme_original ::selection, .scheme_original ::-moz-selection {
-background-color:#003d89;
+background-color:#FF005A;
 }
 .scheme_dark ::selection, .scheme_dark ::-moz-selection {
 background-color:#20c7ca;
@@ -802,7 +802,7 @@ color:#909090;
 	color: #f0f0f0;
 }
 .scheme_original .menu_main_responsive_button:hover:before {
-	color: #003d89;
+	color: #fff;
 }
 .scheme_dark .menu_main_responsive_button:hover:before {
 	color: #20c7ca;
@@ -2121,7 +2121,7 @@ color:rgba(144,144,144,0.6);
 	color: #f0f0f0;
 }
 .scheme_original .scroll_to_top {
-	background-color: #003d89;
+	background-color: #FB0049;
 }
 .scheme_dark .scroll_to_top {
 	background-color: #20c7ca;
@@ -2139,7 +2139,7 @@ color:rgba(144,144,144,0.6);
 	color: #f0f0f0;
 }
 .scheme_original .scroll_to_top:hover {
-	background-color: #ff9279;
+	background-color: #FB0049;
 }
 .scheme_dark .scroll_to_top:hover {
 	background-color: #189799;
@@ -2692,7 +2692,7 @@ input[type="submit"], input[type="reset"], input[type="button"], button, .sc_but
 	border: none;
 }
 .scheme_original input[type="submit"], .scheme_original input[type="reset"], .scheme_original input[type="button"], .scheme_original button, .scheme_original .sc_button.sc_button_style_filled {
-	background-color: #003d89;
+	background-color: #FF005A;
 }
 .scheme_dark input[type="submit"], .scheme_dark input[type="reset"], .scheme_dark input[type="button"], .scheme_dark button, .scheme_dark .sc_button.sc_button_style_filled {
 	background-color: #20c7ca;
@@ -2701,10 +2701,10 @@ input[type="submit"], input[type="reset"], input[type="button"], button, .sc_but
 	color: #fff;
 }
 .scheme_dark input[type="submit"], .scheme_dark input[type="reset"], .scheme_dark input[type="button"], .scheme_dark button, .scheme_dark .sc_button.sc_button_style_filled {
-	color: #f0f0f0;
+	color: #FF005A;
 }
 .scheme_original input[type="submit"]:hover, .scheme_original input[type="reset"]:hover, .scheme_original input[type="button"]:hover, .scheme_original button:hover, .scheme_original .sc_button.sc_button_style_filled:hover {
-	background-color: #ff9279;
+	background-color: #FF005A;
 }
 .scheme_dark input[type="submit"]:hover, .scheme_dark input[type="reset"]:hover, .scheme_dark input[type="button"]:hover, .scheme_dark button:hover, .scheme_dark .sc_button.sc_button_style_filled:hover {
 	background-color: #189799;
@@ -4027,7 +4027,7 @@ input[type="submit"], input[type="reset"], input[type="button"], button, .sc_but
 	color: #a0a0a0;
 }
 .scheme_original .sc_testimonials_style_testimonials-3 .sc_testimonial_content, .scheme_original .sc_testimonials_style_testimonials-3 .sc_testimonial_content:after {
-	background-color: #fff;
+	/*background-color: #fff;*/
 }
 .scheme_dark .sc_testimonials_style_testimonials-3 .sc_testimonial_content, .scheme_dark .sc_testimonials_style_testimonials-3 .sc_testimonial_content:after {
 	background-color: #333;

@@ -1089,7 +1089,7 @@ if (!function_exists('grace_church_sc_contact_form')) {
 							.'<div class="sc_contact_form_item sc_contact_form_message label_over"><label class="required" for="sc_contact_form_message">' . esc_html__('Message', 'grace-church') . '</label><textarea id="sc_contact_form_message" name="message" placeholder="' . esc_html__('Your Message *', 'grace-church') . '"></textarea></div>'
 							
 							
-							.'<div class="g-recaptcha" data-sitekey="6LdiZx4TAAAAALexHX1xPL0K1mtl-968nW7LIu6k"></div>'
+							.'<div class="g-recaptcha" data-sitekey="6LcH9nYaAAAAANu4CP_Af9S5muV_OTsF4zRcVxNk"></div>'
 							
 							
 							.'<div class="sc_contact_form_item sc_contact_form_button"><button>'. esc_html__('SEND', 'grace-church').'</button></div>'
@@ -1228,63 +1228,126 @@ if ( !function_exists( 'grace_church_sc_contact_form_send' ) ) {
 		if (!($contact_email = grace_church_get_theme_option('contact_email')) && !($contact_email = grace_church_get_theme_option('admin_email')))
 			$response['error'] = esc_html__('Unknown admin email!', 'grace-church');
 		else {
-			$type = grace_church_substr($_REQUEST['type'], 0, 7);
-			parse_str($_POST['data'], $post_data);
+            $type = grace_church_substr($_REQUEST['type'], 0, 7);
+            parse_str($_POST['data'], $post_data);
 
-			if ($type=='contact') {
-				$user_name	= grace_church_strshort($post_data['username'],	100);
-				$user_email	= grace_church_strshort($post_data['email'],	100);
-				$user_subj	= grace_church_strshort($post_data['subject'],	100);
-				$user_msg	= grace_church_strshort($post_data['message'],	grace_church_get_theme_option('message_maxlength_contacts'));
-				
-				$captcha_val	= grace_church_strshort($post_data['captcha'],	100);
-				
-				/*if($_SESSION['answer']==$captcha_val) {
-					$subj = sprintf( esc_html__('Site %s - Contact form message from %s', 'grace-church'), get_bloginfo('site_name'), $user_name);
-					$msg = "\n". esc_html__('Name:', 'grace-church')   .' '.esc_html($user_name)
-						.  "\n". esc_html__('E-mail:', 'grace-church') .' '.esc_html($user_email)
-						.  "\n". esc_html__('Subject:', 'grace-church').' '.esc_html($user_subj)
-						.  "\n". esc_html__('Message:', 'grace-church').' '.esc_html($user_msg);
-				}
-				else {
-					$response['error'] = esc_html__('Incorrect captcha given!', 'grace-church');	
-				}*/
-				
-				
-				
-				if(!empty($post_data['g-recaptcha-response'])) {
-					$subj = sprintf( esc_html__('Site %s - Contact form message from %s', 'grace-church'), get_bloginfo('site_name'), $user_name);
-					$msg = "\n". esc_html__('Name:', 'grace-church')   .' '.esc_html($user_name)
-						.  "\n". esc_html__('E-mail:', 'grace-church') .' '.esc_html($user_email)
-						.  "\n". esc_html__('Subject:', 'grace-church').' '.esc_html($user_subj)
-						.  "\n". esc_html__('Message:', 'grace-church').' '.esc_html($user_msg);
-				}
-				else {
-					$response['error'] = esc_html__('Please confirm that you are not a robot!', 'grace-church');	
-				}
-				
-				
-				
-			} else {
+            if ($type == 'contact') {
+                $user_name = grace_church_strshort($post_data['username'], 100);
+                $user_email = grace_church_strshort($post_data['email'], 100);
+                $user_phone = grace_church_strshort($post_data['phone'], 100);
+                $user_subj = grace_church_strshort($post_data['subject'], 100);
+                $user_msg = grace_church_strshort($post_data['message'], grace_church_get_theme_option('message_maxlength_contacts'));
 
-				$subj = sprintf( esc_html__('Site %s - Custom form data', 'grace-church'), get_bloginfo('site_name'));
-				$msg = '';
-				if (is_array($post_data) && count($post_data) > 0) {
-					foreach ($post_data as $k=>$v)
-						$msg .= "\n{$k}: $v";
-				}
-			}
+                $captcha_val = grace_church_strshort($post_data['captcha'], 100);
 
-			$msg .= "\n\n............. " . get_bloginfo('site_name') . " (" . esc_url( home_url( '/' ) ) . ") ............";
+                /*if($_SESSION['answer']==$captcha_val) {
+                    $subj = sprintf( esc_html__('Site %s - Contact form message from %s', 'grace-church'), get_bloginfo('site_name'), $user_name);
+                    $msg = "\n". esc_html__('Name:', 'grace-church')   .' '.esc_html($user_name)
+                        .  "\n". esc_html__('E-mail:', 'grace-church') .' '.esc_html($user_email)
+                        .  "\n". esc_html__('Subject:', 'grace-church').' '.esc_html($user_subj)
+                        .  "\n". esc_html__('Message:', 'grace-church').' '.esc_html($user_msg);
+                }
+                else {
+                    $response['error'] = esc_html__('Incorrect captcha given!', 'grace-church');
+                }*/
 
-			$mail = grace_church_get_theme_option('mail_function');
-			if (!@$mail($contact_email, $subj, apply_filters('grace_church_filter_contact_form_message', $msg))) {
-				$response['error'] = esc_html__('Error send message!', 'grace-church');
-			}
-		
-			echo json_encode($response);
-			die();
-		}
+
+                if (!empty($post_data['g-recaptcha-response'])) {
+                    $subj = sprintf(esc_html__('Site %s - Contact form message from %s', 'grace-church'), get_bloginfo('site_name'), $user_name);
+                    $msg = "You have a new contact email<br/><br/>" . esc_html__('Name:', 'grace-church') . ' ' . esc_html($user_name)
+                        . "<br/>" . esc_html__('E-mail:', 'grace-church') . ' ' . esc_html($user_email)
+                        . "<br/>" . esc_html__('Phone:', 'grace-church') . ' ' . esc_html($user_phone)
+                        . "<br/>" . esc_html__('Subject:', 'grace-church') . ' ' . esc_html($user_subj)
+                        . "<br/>" . esc_html__('Message:', 'grace-church') . ' ' . esc_html($user_msg);
+                } else {
+                    $response['error'] = esc_html__('Please confirm that you are not a robot!', 'grace-church');
+                }
+
+
+            } else {
+
+                $subj = sprintf(esc_html__('Site %s - Custom form data', 'grace-church'), get_bloginfo('site_name'));
+                $msg = '';
+                if (is_array($post_data) && count($post_data) > 0) {
+                    foreach ($post_data as $k => $v)
+                        $msg .= "<br/>{$k}: $v";
+                }
+            }
+
+            $msg .= "<br/><br/>............. " . get_bloginfo('site_name') . " (" . esc_url(home_url('/')) . ") ............";
+
+            if (!empty($post_data['g-recaptcha-response'])) {
+                //echo 'rasel';
+                $url = 'https://www.google.com/recaptcha/api/siteverify';
+                $privatekey = '6LcH9nYaAAAAAD9roGi4VnVvXPWj4G_j5s6kQvUC';
+
+                $response1 = file_get_contents($url . "?secret=" . $privatekey . "&response=" . $post_data['g-recaptcha-response'] . "&remoteip=" . $_SERVER['REMOTE_ADDR']);
+                $data = json_decode($response1);
+                //print_r($data);
+
+
+                if (!empty($data->success) && ($data->success == true)) {
+                    $mail = grace_church_get_theme_option('mail_function');
+                    /*echo $contact_email;
+                    exit;*/
+                    /*if (!@$mail($contact_email, $subj, apply_filters('grace_church_filter_contact_form_message', $msg))) {
+                        $response['error'] = esc_html__('Error send message!', 'grace-church');
+                    }*/
+
+                    /*$message .= '<br/><b>Mailing to:</b><br/>';
+                    $message .= '<b>Address:&nbsp;</b>'.$_POST['address'].'<br/>';
+                    $message .= '<b>City:&nbsp;</b>'.$_POST['city'].'<br/>';
+                    $message .= '<b>State:&nbsp;</b>'.$_POST['state'].'<br/>';
+                    $message .= '<b>Zip:&nbsp;</b>'.$_POST['zip'].'<br/>';
+
+                    $message .= '<b>Message:&nbsp;</b>'.$_POST['message'].'<br/>';*/
+                    /*echo 'rasel'.$contact_email.'rajib';
+                    exit;*/
+                    $email = get_option('admin_email');
+                    //$email = 'rasel028@yahoo.com';
+                    $headers = 'From: Collin Fannin Contact <' . $_POST['email'] . '>' . "\r\n";
+
+                    add_filter('wp_mail_content_type', 'set_html_content_type');
+                    //wp_mail( $contact_email, 'Collin Fannin Medical Society - Contact Email', $msg,$headers);
+                    //wp_mail( 'shahrasel@gmail.com', 'Collin Fannin Medical Society - Contact Email', $msg,$headers);
+                    //remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
+
+                    $mail = new PHPMailer;
+                    //$mail->SMTPDebug = 4;                               // Enable verbose debug output
+                    $mail->isSMTP();                                      // Set mailer to use SMTP
+                    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+                    $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+                    $mail->Host = 'smtp.gmail.com';                        // Specify main and backup SMTP servers
+                    $mail->Port = '465';                                    // TCP port to connect to
+                    $mail->isHTML();
+
+                    $mail->Username = 'collinfannincountyms@gmail.com';                 // SMTP username
+                    $mail->Password = 'Barbee2020!';                           // SMTP password
+
+
+                    $mail->setFrom('no-reply@collinfannincms.org', 'Collin Fannin Contact');
+                    //$mail->addAddress($contact_email, 'Collin Fannin');     // Add a recipient
+                    //$mail->addAddress($contact_email, 'Collin Fannin');     // Add a recipient
+                    $mail->addAddress('russ@eggcelerator.com', 'Collin Fannin');     // Add a recipient
+                    $mail->addAddress('scb@collinfannincms.org', 'Collin Fannin');     // Add a recipient
+                    //$mail->addAddress('shahrasel@gmail.com', 'Collin Fannin');
+
+                    $mail->Subject = 'Collin Fannin Medical Society - Contact Email';
+                    $mail->Body = $msg;
+
+                    if (!$mail->send()) {
+                        //$response[] = 'Message could not be sent.';
+                        //$response = 'Mailer Error: ' . $mail->ErrorInfo;
+                    } else {
+                        //$response[] = 'Message has been sent';
+                    }
+
+
+                    echo json_encode($response);
+                    die();
+                }
+            }
+        }
 	}
 }
 

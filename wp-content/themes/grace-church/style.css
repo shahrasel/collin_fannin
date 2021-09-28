@@ -636,7 +636,7 @@ label.required:after {
 .column-1_2, .column-2_4, .column-3_6, .column-4_8, .column-5_10, .column-6_12	{ width:50%; }
 .column-1_3, .column-2_6, .column-3_9, .column-4_12								{ width:33.33333333%; }
 .column-2_3, .column-4_6, .column-8_12											{ width:66.66666667%; }
-.column-1_4, .column-2_8, .column-3_12											{ width:25%; }
+.column-1_4, .column-2_8, .column-3_12											{ width:25% !important; }
 .column-3_4, .column-6_8, .column-9_12											{ width:75%; }
 .column-1_5, .column-2_10														{ width:20%; }
 .column-2_5, .column-4_10														{ width:40%; }
@@ -1434,7 +1434,7 @@ body:not(.top_panel_fixed) .top_panel_position_over .top_panel_bottom {
     width: 70%;
 }
 .top_panel_wrap.top_panel_style_4 .menu_main_nav_area{
-    margin-left:-250px;
+    /*margin-left:-250px;*/
     right: 0;
     -webkit-transition: all 0.3s ease 0s;
     -moz-transition: all 0.3s ease 0s;
@@ -1842,17 +1842,17 @@ body.collapse_menu .top_panel_wrap .top_panel_wrap_inner .menu_main_nav_area{
 .responsive_menu .top_panel_style_5 .contact_logo,
 .responsive_menu .top_panel_style_6 .contact_logo,
 .responsive_menu .top_panel_style_7 .contact_logo {
-	width: 100% !important;
-    text-align: center;
+	/*width: 100% !important;*/
+    /*text-align: center;*/
 }
 .responsive_menu .top_panel_style_3 .menu_main_wrap,
 .responsive_menu .top_panel_style_4 .menu_main_wrap,
 .responsive_menu .top_panel_style_5 .menu_main_wrap,
 .responsive_menu .top_panel_style_6 .menu_main_wrap,
 .responsive_menu .top_panel_style_7 .menu_main_wrap {
-	width: 100% !important;
+	/*width: 100% !important;*/
     position: relative;
-    text-align: center;
+    text-align: right;
     padding: 1.1rem 0 0.5rem;
 }
 .responsive_menu.top_panel_over .top_panel_style_3 .menu_main_wrap,
@@ -5177,7 +5177,7 @@ div.page_content_wrap       + .copyright_wrap  .copyright_wrap_inner,
 }
 .copyright_style_menu .copyright_text,
 .copyright_style_socials .copyright_text {
-	float:left;
+	/*float:left;*/
 }
 .copyright_style_socials .sc_socials,
 .copyright_style_menu .menu_footer_nav {

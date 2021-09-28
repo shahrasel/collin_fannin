@@ -5,8 +5,9 @@ class Tribe__Events__Default_Values {
 
 	public function __call( $method, $args ) {
 		if ( method_exists( $this, strtolower( $method ) ) ) {
-			return call_user_func_array( array( $this, strtolower( $method ) ), $args );
+			return call_user_func_array( [ $this, strtolower( $method ) ], $args );
 		}
+
 		return '';
 	}
 
@@ -15,7 +16,7 @@ class Tribe__Events__Default_Values {
 	}
 
 	public function venue_id() {
-		return 0;
+		return null;
 	}
 
 	public function organizer() {
@@ -47,7 +48,7 @@ class Tribe__Events__Default_Values {
 	}
 
 	public function country() {
-		return array( '', '' );
+		return [ '', '' ];
 	}
 
 	public function phone() {

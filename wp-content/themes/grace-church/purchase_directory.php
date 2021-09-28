@@ -7,13 +7,11 @@
  * @package xs
  */
 $flag = 0;
-function set_html_content_type() {
-	return 'text/html';
-}
+
 if(!empty($_POST)) {
 	
 	$url = 'https://www.google.com/recaptcha/api/siteverify';
-	$privatekey = '6LdiZx4TAAAAAMzcaIc5l0R-DWjvP1cZvM8YYhww';	
+	$privatekey = '6LfDt0saAAAAABvWWkoOskO4qpZk2IbSjgU7E5K5';
 	$response = file_get_contents($url."?secret=".$privatekey."&response=".$_POST['g-recaptcha-response']."&remoteip=".$_SERVER['REMOTE_ADDR']);
 	$data = json_decode($response);
 	
@@ -265,7 +263,7 @@ $state_lists = array(
       </div>
       <input type="hidden" name="formsub" value="1">
       
-      <div class="g-recaptcha" data-sitekey="6LdiZx4TAAAAALexHX1xPL0K1mtl-968nW7LIu6k"></div>
+      <div class="g-recaptcha" data-sitekey="6LfDt0saAAAAALIWCm2nqPRNSgjG6YUqWPZU_RPD"></div>
       
       <?php if($flag == 2): ?>
 	      <p style="background-color:#ff0000;color:#fff;padding-left:10px">Failed! Please confirm that you are not a robot!</p>

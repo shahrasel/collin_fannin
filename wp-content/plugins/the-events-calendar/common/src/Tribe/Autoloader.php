@@ -53,11 +53,18 @@
 			 * An arrays of arrays each containing absolute paths.
 			 *
 			 * Paths are stored trimming any trailing `/`.
-			 * E.g. `/var/www/tribe-pro/wp-content/plugins/the-event-calendar/src/Tribe`
+			 * E.g. `/var/www/tribe-pro/wp-content/plugins/the-events-calendar/src/Tribe`
 			 *
 			 * @var string[][]
 			 */
 			protected $prefixes;
+
+			/**
+			 * An array of registered prefixes with unique slugs.
+			 *
+			 * @var string[]
+			 */
+			protected $prefix_slugs;
 
 			/**
 			 * The string acting as a directory separator in a class name.
@@ -70,12 +77,12 @@
 			protected $dir_separator = '__';
 
 			/** @var string[] */
-			protected $fallback_dirs = array();
+			protected $fallback_dirs = [];
 
 			/**
 			 * @var array
 			 */
-			protected $class_paths = array();
+			protected $class_paths = [];
 
 			/**
 			 * Returns the singleton instance of the class.
@@ -109,14 +116,31 @@
 			 * @param string $prefix   A class prefix, e.g. `Tribe__Admin__`
 			 * @param string $root_dir The absolute path to the dir containing
 			 *                         the prefixed classes.
+			 * @param string $slug     An optional unique slug to associate to the prefix.
 			 */
-			public function register_prefix( $prefix, $root_dir ) {
+			public function register_prefix( $prefix, $root_dir, $slug = '' ) {
 				$root_dir = $this->normalize_root_dir( $root_dir );
 
-				if ( ! isset( $this->prefixes[ $prefix ] ) ) {
-					$this->prefixes[ $prefix ] = array();
+				// Determine if we need to normalize the $prefix.
+				$is_namespaced = false !== strpos( $prefix, '\\' );
+
+				if ( $is_namespaced ) {
+					// If the prefix is a namespace, then normalize it.
+					$prefix = trim( $prefix, '\\' ) . '\\';
 				}
+
+				if ( ! isset( $this->prefixes[ $prefix ] ) ) {
+					$this->prefixes[ $prefix ] = [];
+				}
+
 				$this->prefixes[ $prefix ][] = $root_dir;
+
+				// Let's make sure we're not adding duplicates.
+				$this->prefixes[ $prefix ] = array_unique( $this->prefixes[ $prefix ] );
+
+				if ( $slug ) {
+					$this->prefix_slugs[ $slug ] = $prefix;
+				}
 			}
 
 			/**
@@ -124,7 +148,7 @@
 			 * autoload register.
 			 */
 			public function register_autoloader() {
-				spl_autoload_register( array( $this, 'autoload' ) );
+				spl_autoload_register( [ $this, 'autoload' ] );
 			}
 
 			/**
@@ -147,11 +171,20 @@
 
 			protected function get_prefixed_path( $class ) {
 				foreach ( $this->prefixes as $prefix => $dirs ) {
+					$is_namespaced = false !== strpos( $prefix, '\\' );
+
 					if ( strpos( $class, $prefix ) !== 0 ) {
 						continue;
 					}
+
 					$class_name = str_replace( $prefix, '', $class );
-					$class_path_frag = implode( '/', explode( $this->dir_separator, $class_name ) ) . '.php';
+
+					if ( ! $is_namespaced ) {
+						$class_path_frag = implode( '/', explode( $this->dir_separator, $class_name ) ) . '.php';
+					} else {
+						$class_path_frag = implode( '/', explode( '\\', $class_name ) ) . '.php';
+					}
+
 					foreach ( $dirs as $dir ) {
 						$path = $dir . '/' . $class_path_frag;
 						if ( ! file_exists( $path ) ) {
@@ -207,6 +240,24 @@
 				$fallback_path = $this->get_fallback_path( $class );
 
 				return $fallback_path ? $fallback_path : '';
+			}
+
+			/**
+			 * Get the registered prefix by slug
+			 *
+			 * @param string $slug Unique slug for registered prefix.
+			 *
+			 * @return false|string Either the prefix registered to the
+			 *                      unique slug or false if not found.
+			 */
+			public function get_prefix_by_slug( $slug ) {
+				$prefix = false;
+
+				if ( isset( $this->prefix_slugs[ $slug ] ) ) {
+					$prefix = $this->prefix_slugs[ $slug ];
+				}
+
+				return $prefix;
 			}
 
 			/**

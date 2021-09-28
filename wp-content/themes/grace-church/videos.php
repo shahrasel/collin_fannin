@@ -27,7 +27,12 @@ $videosLists = $wpdb->get_results($sql,'ARRAY_A');
 
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/appointment-requests"><button >Appointment Requests</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/testimonials"><button>Testimonials</button></a>
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="https://physicianfinder.collinfannincms.com/wp-content/uploads/2020/01/CollinFannin2019Dir_web.pdf" target="_blank"><button>Electronic Directory</button></a>&nbsp;&nbsp;
+
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/add-vendor"><button>Add Vendor</button></a>
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/add-vendor-review"><button>Add Vendor Review</button></a>
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/vendor-appointments"><button>Vendor Appointments</button></a>
+
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="https://physicianfinder.collinfannincms.org/wp-content/uploads/2020/01/CollinFannin2019Dir_web.pdf" target="_blank"><button>Electronic Directory</button></a>&nbsp;&nbsp;
         &nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url().'/videos'; ?>"><button style="background-color: #ff9279">Videos</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/cfcms-directory"><button>My Profile</button></a>

@@ -6,11 +6,6 @@
  * @package xs
  */
 session_start();
-if(empty($_SESSION['ses_user'])) {
-    $_SESSION['adminuser'] = '';
-    header('Location:'.site_url());
-    exit;
-}
 get_header();
 
 if($_REQUEST['task'] == 'delete' && !empty($_REQUEST[id])) {
@@ -20,7 +15,6 @@ if($_REQUEST['task'] == 'delete' && !empty($_REQUEST[id])) {
 
 $sql = "SELECT * FROM `wp_testimonials` where doctor_id='".$_SESSION['ses_user']['id']."' order by id desc";
 $testimonialLists = $wpdb->get_results($sql,'ARRAY_A');
-
 
 if(!empty($_SESSION['ses_user'])):
 ?>
@@ -42,7 +36,7 @@ if(!empty($_SESSION['ses_user'])):
 
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/appointment-requests"><button>Appointment Requests</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/testimonials"><button style="background-color: #ff9279">Testimonials</button></a>
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="https://physicianfinder.collinfannincms.com/wp-content/uploads/2020/01/CollinFannin2019Dir_web.pdf" target="_blank"><button>Electronic Directory</button></a>&nbsp;&nbsp;
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="http://www.emconsultinginc.com/Digital_Publications/CollinFannin/md_2016/"><button>Electronic Directory</button></a>&nbsp;&nbsp;
 
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url().'/videos'; ?>"><button>Videos</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/cfcms-directory"><button>My Profile</button></a>

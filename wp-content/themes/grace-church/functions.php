@@ -2,18 +2,45 @@
 /**
  * Theme sprecific functions and definitions
  */
+include_once( 'phpmailer/PHPMailerAutoload.php' );
 use Twilio\Rest\Client;
 include_once( 'resize-class.php' );
-if($_POST['is_loggedin'] ==1) {
-	$cfcms_info = $wpdb->get_row("select * from ".$wpdb->prefix."cfcms_directory where username ='".$_POST['log']."' and password ='".$_POST['pwd']."'",'ARRAY_A');
-	session_start();
-	$_SESSION['ses_user'] = $cfcms_info;
+global $wpdb;
 
-	wp_redirect( site_url().'/cfcms-directory' ); exit;
+$finder_db = "collinorg";
+$finder_db_user = "collinorg_user";
+$finder_db_pass = "^8faX99z";
+
+if($_POST['is_loggedin'] ==1) {
+
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    $cfcms_info = $mydb->get_row("select * from bestof_users where email ='" . $_POST['log'] . "'", 'ARRAY_A');
+
+    if(!empty($cfcms_info)) {
+        if(($cfcms_info['password'] == $_POST['pwd'])) {
+            if(($cfcms_info['status']=='Active')) {
+
+                $mydb->query("UPDATE `bestof_users` SET `login_status` = 'Logged In' WHERE `id` = ".$cfcms_info['id']);
+
+                session_start();
+                $_SESSION['ses_user'] = $cfcms_info;
+                echo 'login successful';
+                exit;
+            }
+        }
+        else {
+            echo 'password not successful';
+            exit;
+        }
+    }
+    else {
+        echo 'login not successful';
+        exit;
+    }
 }
 if($_REQUEST['logout'] == 'true') {
-	session_start();
-	$_SESSION['ses_user'] = '';
+    session_start();
+    $_SESSION['ses_user'] = '';
 }
 
 //print_r($_REQUEST);
@@ -381,53 +408,29 @@ function physician_finder_form($atts) {
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $sql = "SELECT distinct specialty FROM `wp_cfcms_directory` where specialty<>'' order by specialty asc";
-    $specialtyLists = $wpdb->get_results($sql,'ARRAY_A');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    $cat_lists = $mydb->get_results("select id,title from ".$wpdb->prefix."bestof_categories order by title asc",'ARRAY_A');
 
     $sql = "SELECT distinct office_zip FROM `wp_cfcms_directory` where office_zip<>'' order by office_zip asc";
     $zipLists = $wpdb->get_results($sql,'ARRAY_A');
 
-    echo '<form action="'.site_url().'/physicians-list/">
+    echo '<form action="'.site_url().'/best-of-list/" method="post">
             <div class="sc_columns columns_wrap"  style="padding-right:0px;margin-top:0px;margin-right:0px;padding:5px 10px;background-color: #fff">
-                <div class="column-1_3 column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;background-color: #fff;padding-right: 0px">
-                    <table style="margin-bottom:0px;" width="100%" cellspacing="0" cellpadding="0">
-                        <tbody><tr>
-                          <td width="98%">                
-                            <div class="btn-group bootstrap-select" style="text-align: center;">
-                                <select class="tribe-bar-views-select tribe-no-param" name="speciality" style="width: 100%" required>
-                                  <option value="">Speciality</option>';
-                                    $str = "";
-                                    foreach($specialtyLists as $specialtyList) {
-                                        $str .='<option value="'.$specialtyList['specialty'].'">'.$specialtyList['specialty'].'</option>';
-                                    }
-                                    echo $str;
-                                 echo '</select>
-                            </div>
-                          </td>
-                          <td>&nbsp;|&nbsp;</td>
-                        </tbody>
-                      </table>  
-                </div>
-                <div class="column-2_3 column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;padding-right: 0px">
+                <div class="column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;padding-right: 0px">
                       <table style="margin-bottom:0px;" width="100%" cellspacing="0" cellpadding="0">
                     <tbody><tr>
                       
                       <td width="45%">                
                         <div class="btn-group bootstrap-select">
-                            <select name="accepts" id="accepts" style="width: 100%;padding: 0px">
-                              <option value="">Accepts</option>
-                                <option value="Insurance (PPO)">Insurance (PPO)</option>
-                                <option value="Insurance (HMO)">Insurance (HMO)</option>
-                                <option value="BCBS Advantage HMO">BCBS Advantage HMO</option>
-                                <option value="Insurance (EPO)">Insurance (EPO)</option>
-                                <option value="TRICARE (Military)">TRICARE (Military)</option>
-                                <option value="Medicare">Medicare</option>
-                                <option value="Medicaid">Medicaid</option>
-                                <option value="Cash">Cash</option>
-                                <option value="Uninsured Patients">Uninsured Patients</option>
-                             </select>
+                            <select name="category" id="category" style="width: 100%;padding: 0px">
+                              <option value="">Category</option>';
+                                foreach($cat_lists as $cat_list) {
+                                    echo '<option value="'.$cat_list['title'].'">'.$cat_list['title'].'</option>';
+                                 }
+                             echo '</select>
                         </div>
                       </td>
                       <td>&nbsp;|&nbsp;</td>
@@ -435,7 +438,7 @@ function physician_finder_form($atts) {
                       <td width="24%" style="background-color: #fff">                
                         <div>
                             
-                               <input type="text" class="tribe-bar-views-select tribe-no-param" placeholder="Zip Code" name="zip" style="width: 100% !important;padding: 0px">
+                               <input type="text" class="tribe-bar-views-select tribe-no-param" placeholder="Zip" name="zip" style="width: 100% !important;padding: 0px">
                         </div>
                       </td>
                       <td width="29%" style="padding: 0px">                
@@ -458,29 +461,27 @@ function physician_finder_form_list_view($atts) {
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
 
 
 
     $where_sql = " 1=1 ";
-    if(!empty($_REQUEST['speciality'])) {
-        $where_sql .= " and specialty like '%".$_REQUEST['speciality']."%'";
-    }
-
-    if(!empty($_REQUEST['accepts'])) {
-        $where_sql .= " and accept_medicare like '%".$_REQUEST['accepts']."%'";
+    if(!empty($_REQUEST['category'])) {
+        $where_sql .= " and cat_list like '%".$_REQUEST['category']."%'";
     }
 
     if(!empty($_REQUEST['zip'])) {
         $where_sql .= " and office_zip like '%".$_REQUEST['zip']."%'";
     }
 
-    $sql = "SELECT * FROM `wp_cfcms_directory` where ".$where_sql." order by name asc";
+    $sql = "SELECT * FROM `bestof_users` where ".$where_sql." order by fname asc";
+
+
     //$rows = $mydb->get_results("select Name from my_table");
-    $doctorLists = $mydb->get_results($sql,'ARRAY_A');
+    $doctorLists = $mydb->get_results($mydb->prepare($sql),'ARRAY_A');
 
     echo '<div class="vc_row-full-width"></div>
         <div id="sc_team_1710748512_wrap" class="sc_team_wrap">
@@ -490,17 +491,17 @@ function physician_finder_form_list_view($atts) {
                 $str = "";
                 $i=1;
                     if(!empty($doctorLists)) {
-                        $speciality_str = ($_REQUEST['speciality'])?'('.($_REQUEST['speciality']).')':'';
-                        $str .= "<div style='color: #539953;text-align: center;padding-bottom: 20px' >".count($doctorLists)." Physician".((count($doctorLists)>1)?'s':'')." Found ".$speciality_str."</div>";
+                        $speciality_str = ($_REQUEST['category'])?'('.($_REQUEST['category']).')':'';
+                        $str .= "<div style='color: #539953;text-align: center;padding-bottom: 20px' >".count($doctorLists)." Best of".((count($doctorLists)>1)?'s':'')." Found ".$speciality_str."</div>";
                         foreach ($doctorLists as $doctorList):
-                            $str .= '<div class="column-1_4 column_padding_bottom" style="text-align: center"><a href="' . site_url() . '/physician-details/?id=' . $doctorList['id'] . '">';
+                            $str .= '<div class="column-1_4 column_padding_bottom" style="text-align: center"><a href="' . site_url() . '/best-of-details/?id=' . $doctorList['id'] . '">';
                             if (!empty($doctorList['image'])):
                                 $str .= '<img src="' . $doctorList['image'] . '" style="border-radius:50%;max-width: 150px">';
                             else:
-                                $str .= '<img src="https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" style="border-radius:50%;max-width: 150px">';
+                                $str .= '<img src="https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" style="border-radius:50%;max-width: 150px">';
                             endif;
-                            $str .= '<h5 style="margin-top: 0.3em;font-size: 1.1rem">' . $doctorList['name'] . '</h5>
-                            <p style="margin-bottom: 0px;"><i>' . $doctorList['specialty'] . '</i></p>
+                            $str .= '<h5 style="margin-top: 0.3em;font-size: 1.1rem">' . $doctorList['fname'].' '.$doctorList['lname']. '</h5>
+                            <p style="margin-bottom: 0px;"><i>' . $doctorList['category'] . '</i></p>
                             <p>' . $doctorList['office_city'] . ($doctorList['office_state'] ? ', ' . $doctorList['office_state'] : '') . '</p>
                         </a></div>';
                             if ($i % 4 == 0) {
@@ -510,7 +511,7 @@ function physician_finder_form_list_view($atts) {
                         endforeach;
                     }
                     else {
-                        $str .= "<div style='color: red;text-align: center' >Sorry, no physicians found. Please pick another zip code.</div>";
+                        $str .= "<div style='color: red;text-align: center' >Sorry, no best of found. Please pick another zip code.</div>";
                     }
                  echo $str;
                 echo '</div>
@@ -527,54 +528,35 @@ function physician_finder_form1($atts) {
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $sql = "SELECT distinct specialty FROM `wp_cfcms_directory` where specialty<>'' order by specialty asc";
-    $specialtyLists = $wpdb->get_results($sql,'ARRAY_A');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    $cat_lists = $mydb->get_results("select id,title from ".$wpdb->prefix."bestof_categories order by title asc",'ARRAY_A');
 
     $sql = "SELECT distinct office_zip FROM `wp_cfcms_directory` where office_zip<>'' order by office_zip asc";
     $zipLists = $wpdb->get_results($sql,'ARRAY_A');
 
 
-    echo '<form action="'.site_url().'/physicians-list/">
+    echo '<form action="'.site_url().'/best-of-list/" method="post">
             <div class="sc_columns columns_wrap"  style="padding-right:0px;margin-top:0px;margin-right:0px;padding:5px 2px;background-color: #777777">
-                <div class="column-1_3 column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;background-color: #fff;padding-right: 0px">
-                    <table style="margin-bottom:0px;" width="100%" cellspacing="0" cellpadding="0">
-                        <tbody><tr>
-                          <td width="98%">                
-                            <div class="btn-group bootstrap-select" style="text-align: center;">
-                                <select class="tribe-bar-views-select tribe-no-param" name="speciality" style="width: 100%" required>
-                                  <option value="">Speciality</option>';
-                                    $str = "";
-                                    foreach($specialtyLists as $specialtyList) {
-                                        $str .='<option value="'.$specialtyList['specialty'].'" '.(($_REQUEST['speciality']==$specialtyList['specialty'])?'selected':'').'>'.$specialtyList['specialty'].'</option>';
-                                    }
-                                    echo $str;
-                                 echo '</select>
-                            </div>
-                          </td>
-                          <td>&nbsp;|&nbsp;</td>
-                        </tbody>
-                      </table>  
-                </div>
-                <div class="column-2_3 column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;padding-right: 0px;background-color:#fff">
+                <div class="column-1 column_padding_bottom" style="margin-top:0px;padding-bottom: 0px;padding-right: 0px;background-color:#fff">
                       <table style="margin-bottom:0px;" width="100%" cellspacing="0" cellpadding="0">
                     <tbody><tr>
                       
                       <td width="45%">                
                         <div class="btn-group bootstrap-select">
-                            <select name="accepts" id="accepts" style="width: 100%;padding: 0px">
-                              <option value="">Accepts</option>
-                              <option value="Insurance (PPO)" '.(($_REQUEST['accepts']=='Insurance (PPO)')?'selected':'').'>Insurance (PPO)</option>
-                                    <option value="Insurance (HMO)" '.(($_REQUEST['accepts']=='Insurance (HMO)')?'selected':'').'>Insurance (HMO)</option>
-                                    <option value="BCBS Advantage HMO" '.(($_REQUEST['accepts']=='BCBS Advantage HMO')?'selected':'').'>BCBS Advantage HMO</option>
-                                    <option value="Insurance (EPO)" '.(($_REQUEST['accepts']=='Insurance (EPO)')?'selected':'').'>Insurance (EPO)</option>
-                                    <option value="TRICARE (Military)" '.(($_REQUEST['accepts']=='TRICARE (Military)')?'selected':'').'>TRICARE (Military)</option>
-                                    <option value="Medicare" '.(($_REQUEST['accepts']=='Medicare')?'selected':'').'>Medicare</option>
-                                    <option value="Medicaid" '.(($_REQUEST['accepts']=='Medicare')?'selected':'').'>Medicaid</option>
-                                    <option value="Cash" '.(($_REQUEST['accepts']=='Medicare')?'selected':'').'>Cash</option>
-                                    <option value="Uninsured Patients" '.(($_REQUEST['accepts']=='Medicare')?'selected':'').'>Uninsured Patients</option>
-                             </select>
+                            <select name="category" id="category" style="width: 100%;padding: 0px">
+                              <option value="">Category</option>';
+                                foreach($cat_lists as $cat_list) {
+                                    if(!empty($_REQUEST['category'])) {
+                                        echo '<option value="' . $cat_list['title'] . '" '.(($_REQUEST['category']==$cat_list['title'])?"selected":"").'>' . $cat_list['title'] . '</option>';
+                                    }
+                                    else {
+                                        echo '<option value="' . $cat_list['title'] . '">' . $cat_list['title'] . '</option>';
+                                    }
+                                }
+                             echo '</select>
                         </div>
                       </td>
                       <td>&nbsp;|&nbsp;</td>
@@ -606,23 +588,24 @@ function physician_details_user_photo_name($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
     $doctor_info = $doctor_single[0];
     //print_r($doctor_info);exit;
     $str = "";
     if(!empty($doctor_info->image)):
         $str.='<img src="'.$doctor_info->image.'" style="border-radius:50%;max-width: 150px">';
     else:
-        $str.='<img src="https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" style="border-radius:50%;max-width: 150px">';
+        $str.='<img src="https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" style="border-radius:50%;max-width: 150px">';
     endif;
-    $str.='<h5 style="margin-top: 0.3em; font-size: 1.1rem; color: #031f73;">'.$doctor_info->name.'</h5>';
-    $str.='<p style="margin-bottom: 0px;"><span style="color: #5f5f5f;"><i>'.$doctor_info->specialty.'</i></span></p>';
+    $str.='<h5 style="margin-top: 0.3em; font-size: 1.1rem; color: #031f73;">'.$doctor_info->fname.' '.$doctor_info->lname.'</h5>';
+    //$str.='<p style="margin-bottom: 0px;"><span style="color: #5f5f5f;"><i>'.implode(', ',json_decode($doctor_info->cat_list)).'</i></span></p>';
     $str.='<span style="color: #fd7200;">'.$doctor_info->office_city.', '.$doctor_info->office_state.'</span>';
-    echo $str.='<span style="color: #fd7200;margin-top: 50px;display: block"><a href="#appoint_row"><img src="https://physicianfinder.collinfannincms.com/wp-content/uploads/2020/01/RequestanAppointment.png"></a></span>';
+    echo $str.='<span style="color: #fd7200;margin-top: 50px;display: block"><a href="#appoint_row"><img src="https://physicianfinder.collinfannincms.org/wp-content/uploads/2020/01/RequestanAppointment.png"></a></span>';
 
 }
 add_shortcode('physician_details_user_photo_name', 'physician_details_user_photo_name');
@@ -636,20 +619,21 @@ function physician_details_doctor_accept($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
     $doctor_info = $doctor_single[0];
 
+    //implode(', ',json_decode($doctor_info->cat_list))
 
-
-    if(!empty($doctor_info->accept_medicare)) {
-        $arr = explode(',',trim($doctor_info->accept_medicare));
+    if(!empty($doctor_info->cat_list)) {
+        $arr = json_decode($doctor_info->cat_list);
 
         $str = "";
-        $str .= '<p style="text-align: center; color: #031f73; font-weight: bold;font-size: 20px;margin-bottom: 5px;margin-top: 20px">Accepts</p><div style="text-align: center;">';
+        $str .= '<p style="text-align: center; color: #031f73; font-weight: bold;font-size: 20px;margin-bottom: 5px;margin-top: 20px">Categories</p><div style="text-align: center;">';
 
 
         foreach ($arr as $ar):
@@ -670,11 +654,12 @@ function physician_details_doctor_details($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
     $doctor_info = $doctor_single[0];
 
     echo nl2br($doctor_info->biography);
@@ -690,11 +675,12 @@ function physician_details_doctor_office_info($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
     $doctor_info = $doctor_single[0];
 
     //echo $doctor_info->biography;
@@ -719,10 +705,10 @@ function physician_details_doctor_office_info($atts)
     }
 
     if(!empty($doctor_info->website)) {
-        $str .= '<p style="color: #031f73; font-weight: bold; font-size: 14px;">Website: <span style="color: #9fa0a3; font-weight: normal;"><a target="_blank" href="' . $doctor_info->website . '">' . $doctor_info->website . '</a></span></p>';
+        $str .= '<p style="color: #031f73; font-weight: bold; font-size: 14px;">Website: <span style="color: #9fa0a3; font-weight: normal;"><a target="_blank" href="' . (!strstr($doctor_info->website,'http://')?'http://'.$doctor_info->website:'') . '">' . $doctor_info->website . '</a></span></p>';
     }
 
-    $str .= '<p><a target="_blank" href="https://www.google.com/maps/place/'.$address.'"><img src="https://physicianfinder.collinfannincms.com/wp-content/uploads/2020/01/GET_DIRECTIONS_BUTTON.png"></a></p>';
+    $str .= '<p><a target="_blank" href="https://www.google.com/maps/place/'.$address.'"><img src="https://physicianfinder.collinfannincms.org/wp-content/uploads/2020/01/GET_DIRECTIONS_BUTTON.png"></a></p>';
 
     if(!empty($doctor_info->office_direction)) {
         $str .= '<a href="' . $doctor_info->office_direction . '" target="_blank"><img src="' . site_url() . '/wp-content/uploads/2020/01/GET_DIRECTIONS_BUTTON.png" alt="" /></a>';
@@ -736,90 +722,33 @@ $flag = 0;
 
 if(!empty($_POST['doctor_detail_formsub'])) {
 
-    $url = 'https://www.google.com/recaptcha/api/siteverify';
-    $privatekey = '6LdiZx4TAAAAAMzcaIc5l0R-DWjvP1cZvM8YYhww';
+    /*$url = 'https://www.google.com/recaptcha/api/siteverify';
+    $privatekey = '6LfDt0saAAAAABvWWkoOskO4qpZk2IbSjgU7E5K5';
     $response = file_get_contents($url."?secret=".$privatekey."&response=".$_POST['g-recaptcha-response']."&remoteip=".$_SERVER['REMOTE_ADDR']);
     $data = json_decode($response);
 
-    if(!empty($data->success) && ($data->success == true)) {
+    if(!empty($data->success) && ($data->success == true)) {*/
 
-        global $wpdb;
+        global $wpdb,$finder_db_user,$finder_db_pass,$finder_db;
 
 
-    $wpdb->query("INSERT INTO `wp_req_appointments` (`id`, `doctor_id`, `first_name`, `last_name`, `cell`, `email`, `network_type`, `insurance_name`, `preferred_appointment`, `created`, `status`) VALUES (NULL, '".$_REQUEST['doctor_id']."', '".$_POST['first_name']."', '".$_POST['last_name']."', '".$_POST['cell']."', '".$_POST['email']."', '".$_POST['network_type']."', '".$_POST['insurance_provider_name']."', '".$_POST['appointment_date_time']."', '".time()."', 'Active')");
+        $wpdb->query("INSERT INTO `wp_req_appointments` (`id`, `bestof_id`, `first_name`, `last_name`, `cell`, `email`, `preferred_appointment`, `comment`, `created`, `status`) VALUES (NULL, '".$_REQUEST['bestof_id']."', '".$_POST['first_name']."', '".$_POST['last_name']."', '".$_POST['cell']."', '".$_POST['email']."', '".$_POST['appointment_date_time']."', '".$_POST['comment']."', '".time()."', 'Active')");
 
-        $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
 
-        $doctor_single = $mydb->get_results("select username,office_phone,office_text from wp_cfcms_directory where id='" . $_REQUEST['id'] . "' limit 1");
+
+        //$mydb = new wpdb('root','root','collin','localhost:8888');
+        $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+
+        $doctor_single = $mydb->get_results("select email,office_phone,office_text, office_email from bestof_users where id='" . $_REQUEST['bestof_id'] . "' limit 1");
         $doctor_info = $doctor_single[0];
 
 
-
-
-        require_once get_template_directory().'/twilio-php-master/src/Twilio/autoload.php';
-
-
-
-
-    $message = "New Appointment Request from CFCMS Physician Finder!\n\n";
-        $message .= "First Name: ".$_REQUEST['first_name']."\n";
-        $message .= "Last Name: ".$_REQUEST['last_name']."\n";
-        $message .= "Cell: ".$_REQUEST['cell']."\n";
-        $message .= "Email: ".$_REQUEST['email']."\n";
-        $message .= "Payment Method: ".$_REQUEST['network_type']."\n";
-
-        $message .= "Insurance: ".$_REQUEST['insurance_provider_name']."\n";
-        $message .= "Appointment Date Time: ".$_REQUEST['appointment_date_time']."\n";
-
-        $messageno = $doctor_info->office_text;
-
-        $sid = "AC4b59c15a748d9356a4ab1aaeee9bac02";
-        $token = "fd588812b3fc5ddbdc03fd284606f07b";
-
-        $client = new Client($sid, $token);
-
-
-        $client->messages->create(
-            $messageno,
-            array(
-                // A Twilio phone number you purchased at twilio.com/console
-                'from' => "+19723320914",
-                // the body of the text message you'd like to send
-                'body' => $message
-            )
-        );
-
-
-
-
-
-
-    /*$message = 'New purchase directory message:<br/><br/>';
-    $message .= '<b>Name:&nbsp;</b>'.$_POST['username'].'<br/>';
-    $message .= '<b>Email:&nbsp;</b>'.$_POST['email'].'<br/>';
-    $message .= '<b>Cell:&nbsp;</b>'.$_POST['phone'].'<br/>';
-    $message .= '<b>Quanity:&nbsp;</b>'.$_POST['quantity'].'<br/>';
-
-    $message .= '<br/><b>Mailing to:</b><br/>';
-    $message .= '<b>Address:&nbsp;</b>'.$_POST['address'].'<br/>';
-    $message .= '<b>City:&nbsp;</b>'.$_POST['city'].'<br/>';
-    $message .= '<b>State:&nbsp;</b>'.$_POST['state'].'<br/>';
-    $message .= '<b>Zip:&nbsp;</b>'.$_POST['zip'].'<br/>';
-
-    $message .= '<b>Message:&nbsp;</b>'.$_POST['message'].'<br/>';
-
-    $email = get_option( 'admin_email' );
-    $headers = 'From: Collin Fannin <'.$_POST['email'].'>' . "\r\n";
-
-    add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-    wp_mail( $email, 'Purchase a directory', $message,$headers);
-    remove_filter( 'wp_mail_content_type', 'set_html_content_type' );*/
         $flag = 1;
         $_POST = array();
-    }
+    /*}
     else {
         $flag = 2;
-    }
+    }*/
 }
 
 function physician_details_contact($atts)
@@ -829,16 +758,17 @@ function physician_details_contact($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section,$flag;
+    global $post, $wpdb, $within_section,$flag,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='" . $_REQUEST['id'] . "' limit 1");
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='" . $_REQUEST['id'] . "' limit 1");
     $doctor_info = $doctor_single[0];
 
     if($flag == 1) {
         echo '<div style="color:#25a162;text-align: center;margin-bottom: 20px;font-size: 16px;font-weight: bold;">
-                Thank you for your appointment request. This physician\'s representative will reach out to you shortly.
+                Thank you for your appointment request. This best of representative will reach out to you shortly.
 </div>';
     }
     echo '
@@ -866,39 +796,24 @@ function physician_details_contact($atts)
                   <input type="text" placeholder="Email" name="email" id="email" value="">
                 </div>
                 
-                <div class="sc_contact_form_item sc_contact_form_field label_over">
-                  <label for="network_type">Payment Method</label>
-                  
-                  
-                  <select name="network_type" style="border: 2px solid #f4f4f4; padding: 0.8em 1.9em; width: 100%;" >
-                    <option value="">Select Payment</option>
-                      <option value="Insurance (PPO)">Insurance (PPO)</option>
-                      <option value="Insurance (HMO)">Insurance (HMO)</option>
-                      <option value="BCBS Advantage HMO">BCBS Advantage HMO</option>
-                      <option value="Insurance (EPO)">Insurance (EPO)</option>
-                      <option value="TRICARE (Military)">TRICARE (Military)</option>
-                      <option value="Medicare">Medicare</option>
-                      <option value="Medicaid">Medicaid</option>
-                      <option value="Cash">Cash</option>
-                      <option value="Uninsured Patients">Uninsured Patients</option>
-                  </select>
-                </div>
-                
-                <div class="sc_contact_form_item sc_contact_form_field label_over">
-                  <label for="insurance_provider_name">Insurance Provider Name</label>
-                  <input type="text" placeholder="Insurance Provider Name" name="insurance_provider_name" id="insurance_provider_name" value="">
-                </div>
-                <div class="sc_contact_form_item sc_contact_form_field label_over">
-                  <label for="appointment_date_time">Preferred Appointment Date/Time</label>
-                  <input type="text" placeholder="Preferred Appointment Date/Time" name="appointment_date_time" id="showing_time" value="">
+                <div>
+                    <div class="sc_contact_form_item sc_contact_form_field label_over" style="float: left;">
+                      <label for="appointment_date_time">Preferred Appointment Date/Time</label>
+                      <input type="text" placeholder="Preferred Appointment Date/Time" name="appointment_date_time" id="showing_time" value="">
+                    </div>
+                    
+                    <div class="sc_contact_form_item sc_contact_form_field label_over">
+                      <label for="email">Additional Comment</label>
+                      <textarea name="comment" style="width: 100%"></textarea>  
+                    </div>
                 </div>
                 
                 <div style="width: 100%">
-                    <div class="g-recaptcha sc_contact_form_item sc_contact_form_field label_over" data-sitekey="6LdiZx4TAAAAALexHX1xPL0K1mtl-968nW7LIu6k"></div>
+                    <div class="g-recaptcha sc_contact_form_item sc_contact_form_field label_over" data-sitekey="6LfDt0saAAAAALIWCm2nqPRNSgjG6YUqWPZU_RPD"></div>
                 </div>
                 
               </div>
-               <input type="hidden" name="doctor_id" value="'.$_GET['id'].'"> 
+               <input type="hidden" name="bestof_id" value="'.$_GET['id'].'"> 
               <input type="hidden" name="doctor_detail_formsub" value="1">
               
               <div class="sc_contact_form_item sc_contact_form_button" style="margin-top:10px;">
@@ -922,12 +837,15 @@ function physician_details_doctor_map($atts)
         'count' => 3
     ), $atts));
 
-    global $post, $wpdb, $within_section;
+    global $post, $wpdb, $within_section,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
 
-    $doctor_single = $mydb->get_results("select * from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+    $doctor_single = $mydb->get_results("select * from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
     $doctor_info = $doctor_single[0];
+    //print_r($doctor_info);
+
 
     $address_str = (($doctor_info->office_address1)?$doctor_info->office_address1:'').(($doctor_info->office_address2)?' '.$doctor_info->office_address2:'').(($doctor_info->office_city)?' '.$doctor_info->office_city:'').(($doctor_info->office_state)?' '.$doctor_info->office_state:'').(($doctor_info->office_zip)?' '.$doctor_info->office_zip:'');
     //echo $doctor_info->biography;
@@ -974,7 +892,7 @@ function physician_finder_top($atts) {
         'count' => 3
     ), $atts));
 
-    echo '<a id="gototop" style="cursor:pointer;" ><img class="aligncenter" src="https://physicianfinder.collinfannincms.com/wp-content/uploads/2019/11/Get-started.jpg" alt="" /></a>';
+    echo '<a id="gototop" style="cursor:pointer;" ><img class="aligncenter" src="'.site_url() .'/wp-content/uploads/2021/03/get_started.png" alt="" /></a>';
 }
 
 add_shortcode('physician_finder_top', 'physician_finder_top');
@@ -982,16 +900,17 @@ add_shortcode('physician_finder_top', 'physician_finder_top');
 add_action('wp_footer', 'themeslug_enqueue_script');
 function themeslug_enqueue_script() {
 
-    global $page,$post,$wpdb;
+    global $page,$post,$wpdb,$finder_db_user,$finder_db_pass,$finder_db;
 
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
 
     if($page->post_name == 'physician-finder-home' && !is_admin()) {
         wp_enqueue_script('script1x1', 'https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js');
     }
 
-    if($post->post_name == 'physician-details' && !is_admin()) {
-        $testimonial_lists1 = $mydb->get_results("select * from ".$wpdb->prefix."testimonials where doctor_id = '".$_GET['id']."' order by ID desc",'ARRAY_A');
+    if($post->post_name == 'best-of-details' && !is_admin()) {
+        $testimonial_lists1 = $mydb->get_results("select * from ".$wpdb->prefix."bestof_reviews where vendor_id = '".$_GET['id']."' order by ID desc",'ARRAY_A');
 
         //print_r($testimonial_lists1);
 
@@ -1001,11 +920,27 @@ function themeslug_enqueue_script() {
 
     $testimonial_lists = query_posts( array( 'post_type' => 'testimonial', 'testimonial_group' => 'group-3' ) );
     echo '<script>jQuery(document).ready( function($) {';
+
+    echo "$('#login_form').submit(function(e) {
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+
+    var form = $(this);
+    var url = form.attr('action');
+    
+    $.ajax({
+           type: 'POST',
+           url: url,
+           data: form.serialize(), 
+           success: function(data)
+           {
+               if(data == 'login not successful') {jQuery('#password_failed').css('display','none');jQuery('#login_failed').css('display','block')} else if(data == 'password not successful') {jQuery('#login_failed').css('display','none');jQuery('#password_failed').css('display','block')} else {window.location.replace('".site_url()."/my-profile');} } });  });";
+
     echo '$("#gototop").on("click", function() {
     $(window).scrollTop(0);
 });';
 
-    if($post->post_name == 'physician-details' && !is_admin()) {
+    if($post->post_name == 'best-of-details' && !is_admin()) {
         echo 'initMap();';
         echo 'jQuery(\'#showing_time\').datetimepicker({
                 timeFormat: "hh:mm tt",
@@ -1013,14 +948,14 @@ function themeslug_enqueue_script() {
 
 
 
-        $doctor_single = $mydb->get_results("select bg_image from wp_cfcms_directory where id='".$_REQUEST['id']."' limit 1") ;
+        $doctor_single = $mydb->get_results("select bg_image from bestof_users where id='".$_REQUEST['id']."' limit 1") ;
         $doctor_info = $doctor_single[0];
         //echo "alert('+$doctor_info+')";
         if(!empty($doctor_info->bg_image)) {
             echo "jQuery('#top_background').css('background-image', 'url($doctor_info->bg_image )');";
         }
         else {
-            echo "jQuery('#top_background').css('background-image', 'url(https://physicianfinder.collinfannincms.com/wp-content/uploads/2019/11/Office-Background.jpg?id=2543)');";
+            echo "jQuery('#top_background').css('background-image', 'url(https://physicianfinder.collinfannincms.org/wp-content/uploads/2019/11/Office-Background.jpg?id=2543)');";
         }
     }
 
@@ -1049,13 +984,16 @@ function acf_load_color_field_choices( $field ) {
     // remove any unwanted white space
     //$choices = array('','Shah','alam','rasel');
 
-    global $wpdb;
-    $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
-    $doctor_lists = $mydb->get_results("select id,name,username from ".$wpdb->prefix."cfcms_directory where 1=1 order by name asc",'ARRAY_A');
+    global $wpdb,$finder_db_user,$finder_db_pass,$finder_db;
+
+    $mydb = new wpdb($finder_db_user,$finder_db_pass,$finder_db,'localhost:8888');
+    //$mydb = new wpdb('root','root','collin','localhost:8888');
+    $doctor_lists = $mydb->get_results("select id,fname,lname,email from bestof_users where 1=1 order by fname asc",'ARRAY_A');
     if(count($doctor_lists)>0) {
         $i = 0;
+        $field['choices'][''] = '-- Select a Best of user --';
         foreach ($doctor_lists as $doctor_list) {
-            $field['choices'][ $doctor_list['id'] ] = $doctor_list['name'].(($doctor_list['username'])?' - '.$doctor_list['username']:'');
+            $field['choices'][ $doctor_list['id'] ] = $doctor_list['fname'].' '.$doctor_list['lname'].(($doctor_list['email'])?' - '.$doctor_list['email']:'');
         }
     }
 
@@ -1268,7 +1206,7 @@ function cfcmslist_edit()
                                 <td><?php echo $cfcms_list['name'] ?></td>
                                 <td><?php echo $cfcms_list['specialty'] ?></td>
                                 <td>
-                                    <img src="<?php if (!empty($cfcms_list['image'])): ?><?php echo $cfcms_list['image']; else: ?>https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>"
+                                    <img src="<?php if (!empty($cfcms_list['image'])): ?><?php echo $cfcms_list['image']; else: ?>https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>"
                                          width="70"/></td>
                                 <!--<td><?php echo $cfcms_list['practice_name'] ?></td>-->
                                 <td><?php echo $cfcms_list['office_city'] ?></td>
@@ -1377,17 +1315,17 @@ if(!empty($_POST['action']) && ($_POST['action'] == 'leadupdate') && !empty($_PO
 
 
 
-        $wpdb->query("UPDATE `wp_cfcms_directory` SET `name` = '".$_POST['username']."',`username` = '".$_POST['login_email']."', ".$pass_str." `specialty` = '".$_POST['specialty']."', `practice_name` = '".$_POST['practice_name']."', `image` = '".$image_name."', ".$bg_imge_sql_str."  `manager_name` = '".$_POST['manager_name']."',  `office_address1` = '".$_POST['office_address1']."', `office_address2` = '".$_POST['office_address2']."', `office_city` = '".$_POST['office_city']."', `office_state` = '".$_POST['office_state']."', `office_zip` = '".$_POST['office_zip']."', `office_phone` = '".$_POST['office_phone']."', `office_text` = '".$_POST['office_text']."', `office_fax` = '".$_POST['office_fax']."', `office_email` = '".$_POST['office_email']."', `website` = '".$_POST['website']."', `nurse_name` = '".$_POST['nurse_name']."', `nurse_phone` = '".$_POST['nurse_phone']."', `nurse_email` = '".$_POST['nurse_email']."', `accept_medicare` = '".implode(',',$_POST['accept_medicare'])."', `hospital_affiliation` = '".$_POST['hospital_affiliation']."', `medical_school` = '".$_POST['medical_school']."', `residency` = '".$_POST['residency']."', `internship` = '".$_POST['internship']."', `board_certification` = '".$_POST['board_certification']."', `biography` = '".$_POST['biography']."', `updated` = '".time()."' WHERE `id` = ".$_REQUEST['leadid']);
+        $wpdb->query("UPDATE `wp_cfcms_directory` SET `name` = '".$_POST['username']."', ".$pass_str." `specialty` = '".$_POST['specialty']."', `practice_name` = '".$_POST['practice_name']."', `image` = '".$image_name."', ".$bg_imge_sql_str."  `manager_name` = '".$_POST['manager_name']."',  `office_address1` = '".$_POST['office_address1']."', `office_address2` = '".$_POST['office_address2']."', `office_city` = '".$_POST['office_city']."', `office_state` = '".$_POST['office_state']."', `office_zip` = '".$_POST['office_zip']."', `office_phone` = '".$_POST['office_phone']."', `office_text` = '".$_POST['office_text']."', `office_fax` = '".$_POST['office_fax']."', `office_email` = '".$_POST['office_email']."', `website` = '".$_POST['website']."', `nurse_name` = '".$_POST['nurse_name']."', `nurse_phone` = '".$_POST['nurse_phone']."', `nurse_email` = '".$_POST['nurse_email']."', `accept_medicare` = '".implode(',',$_POST['accept_medicare'])."', `hospital_affiliation` = '".$_POST['hospital_affiliation']."', `medical_school` = '".$_POST['medical_school']."', `residency` = '".$_POST['residency']."', `internship` = '".$_POST['internship']."', `board_certification` = '".$_POST['board_certification']."', `biography` = '".$_POST['biography']."', `updated` = '".time()."' WHERE `id` = ".$_REQUEST['leadid']);
     }
     else {
 
         //echo "UPDATE `wp_cfcms_directory` SET `name` = '".$_POST['username']."', ".$pass_str." `specialty` = '".$_POST['specialty']."', `practice_name` = '".$_POST['practice_name']."', ".$bg_imge_sql_str."  `manager_name` = '".$_POST['manager_name']."',   `office_address1` = '".$_POST['office_address1']."', `office_address2` = '".$_POST['office_address2']."', `office_city` = '".$_POST['office_city']."', `office_state` = '".$_POST['office_state']."', `office_zip` = '".$_POST['office_zip']."', `office_phone` = '".$_POST['office_phone']."', `office_fax` = '".$_POST['office_fax']."',  `office_email` = '".$_POST['office_email']."', `website` = '".$_POST['website']."', `nurse_name` = '".$_POST['nurse_name']."', `nurse_phone` = '".$_POST['nurse_phone']."', `nurse_email` = '".$_POST['nurse_email']."', `accept_medicare` = '".implode(',',$_POST['accept_medicare'])."', `hospital_affiliation` = '".$_POST['hospital_affiliation']."', `medical_school` = '".$_POST['medical_school']."', `residency` = '".$_POST['residency']."', `internship` = '".$_POST['internship']."', `board_certification` = '".$_POST['board_certification']."', `biography` = '".$_POST['biography']."',  `updated` = '".time()."' WHERE `id` = ".$_REQUEST['leadid'];
 
-        $wpdb->query("UPDATE `wp_cfcms_directory` SET `name` = '".$_POST['username']."',`username` = '".$_POST['login_email']."', ".$pass_str." `specialty` = '".$_POST['specialty']."', `practice_name` = '".$_POST['practice_name']."', ".$bg_imge_sql_str."  `manager_name` = '".$_POST['manager_name']."',   `office_address1` = '".$_POST['office_address1']."', `office_address2` = '".$_POST['office_address2']."', `office_city` = '".$_POST['office_city']."', `office_state` = '".$_POST['office_state']."', `office_zip` = '".$_POST['office_zip']."', `office_phone` = '".$_POST['office_phone']."', `office_text` = '".$_POST['office_text']."', `office_fax` = '".$_POST['office_fax']."',  `office_email` = '".$_POST['office_email']."', `website` = '".$_POST['website']."', `nurse_name` = '".$_POST['nurse_name']."', `nurse_phone` = '".$_POST['nurse_phone']."', `nurse_email` = '".$_POST['nurse_email']."', `accept_medicare` = '".implode(',',$_POST['accept_medicare'])."', `hospital_affiliation` = '".$_POST['hospital_affiliation']."', `medical_school` = '".$_POST['medical_school']."', `residency` = '".$_POST['residency']."', `internship` = '".$_POST['internship']."', `board_certification` = '".$_POST['board_certification']."', `biography` = '".$_POST['biography']."',  `updated` = '".time()."' WHERE `id` = ".$_REQUEST['leadid']);
+        $wpdb->query("UPDATE `wp_cfcms_directory` SET `name` = '".$_POST['username']."', ".$pass_str." `specialty` = '".$_POST['specialty']."', `practice_name` = '".$_POST['practice_name']."', ".$bg_imge_sql_str."  `manager_name` = '".$_POST['manager_name']."',   `office_address1` = '".$_POST['office_address1']."', `office_address2` = '".$_POST['office_address2']."', `office_city` = '".$_POST['office_city']."', `office_state` = '".$_POST['office_state']."', `office_zip` = '".$_POST['office_zip']."', `office_phone` = '".$_POST['office_phone']."', `office_text` = '".$_POST['office_text']."', `office_fax` = '".$_POST['office_fax']."',  `office_email` = '".$_POST['office_email']."', `website` = '".$_POST['website']."', `nurse_name` = '".$_POST['nurse_name']."', `nurse_phone` = '".$_POST['nurse_phone']."', `nurse_email` = '".$_POST['nurse_email']."', `accept_medicare` = '".implode(',',$_POST['accept_medicare'])."', `hospital_affiliation` = '".$_POST['hospital_affiliation']."', `medical_school` = '".$_POST['medical_school']."', `residency` = '".$_POST['residency']."', `internship` = '".$_POST['internship']."', `board_certification` = '".$_POST['board_certification']."', `biography` = '".$_POST['biography']."',  `updated` = '".time()."' WHERE `id` = ".$_REQUEST['leadid']);
     }
 
 
-    wp_redirect( site_url().'/wp-admin/admin.php?page=cfcms-list' );
+    wp_redirect( site_url().'/wp-admin/admin.php?page=rleads' );
     exit;
 }
 
@@ -1470,7 +1408,7 @@ function member_edit()
             <table width="100%" cellpadding="5" cellspacing="5">
                 <tr>
                     <td width="20%"><strong>Name</strong></td>
-                    <td width="80%"><input type="text" id="land_page_title" name="username" value="<?php echo $lead_info['name']; ?>" class="mediumtext" style="width:50%"/></td>
+                    <td width="80%"><input type="text" id="land_page_title" name="username" value="<?php echo $lead_info['username']; ?>" class="mediumtext" style="width:50%"/></td>
                 </tr>
                 <tr>
                     <td width="20%"><strong>Specialty</strong></td>
@@ -1482,12 +1420,6 @@ function member_edit()
                         </select>
                     </td>
                 </tr>
-
-                <tr>
-                    <td width="20%"><strong>Login Email</strong></td>
-                    <td width="80%"><input type="text" name="login_email" value="<?php echo $lead_info['username']; ?>" class="mediumtext" style="width:50%"/></td>
-                </tr>
-
                 <tr>
                     <td width="20%"><strong>Practice Name</strong></td>
                     <td width="80%"><input type="text" name="practice_name" value="<?php echo $lead_info['practice_name']; ?>" class="mediumtext" style="width:50%"/></td>
@@ -1499,7 +1431,7 @@ function member_edit()
                         <?php if(!empty($lead_info['image'])): ?>
                             <br/><img src="<?php echo $lead_info['image'] ?>" width="100" /><br/>
                         <?php else: ?>
-                            <br/><img src="https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" width="100" /><br/>
+                            <br/><img src="https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg" width="100" /><br/>
                         <?php endif; ?>
                         <input type="file" name="image" style="border:none;padding-left:0px;">
                         <p>250 px X 250px size photo is recommended</p>
@@ -1512,7 +1444,7 @@ function member_edit()
                         <?php if(!empty($lead_info['bg_image'])): ?>
                             <br/><img src="<?php echo $lead_info['bg_image'] ?>" width="100" /><br/>
                         <?php else: ?>
-                            <br/><img src="https://physicianfinder.collinfannincms.com/wp-content/uploads/2019/11/Office-Background.jpg?id=2543" width="200" /><br/>
+                            <br/><img src="https://physicianfinder.collinfannincms.org/wp-content/uploads/2019/11/Office-Background.jpg?id=2543" width="200" /><br/>
                         <?php endif; ?>
                         <input type="file" name="bg_image" style="border:none;padding-left:0px;">
                         <p>1600px X 235px size photo is recommended</p>
@@ -1526,7 +1458,7 @@ function member_edit()
                     </td>
                 </tr>
 
-                <!--<h2>Office Info:</h2>-->
+                <h2>Office Info:</h2>
 
                 <tr>
                     <td width="20%"><strong>office address 1</strong></td>
@@ -1586,7 +1518,7 @@ function member_edit()
                 </tr>
 
 
-                <!--<h2>Assistance/Nurse Info:</h2>-->
+                <h2>Assistance/Nurse Info:</h2>
                 <tr>
                     <td width="20%"><strong>Nurse Name</strong></td>
                     <td width="80%"><input type="text" name="nurse_name" value="<?php echo $lead_info['nurse_name']; ?>" class="mediumtext" style="width:50%"/></td>
@@ -1602,7 +1534,7 @@ function member_edit()
                     <td width="80%"><input type="text" name="nurse_email" value="<?php echo $lead_info['nurse_email']; ?>" class="mediumtext" style="width:50%"/></td>
                 </tr>
 
-                <!--<h2>Accepts</h2>-->
+                <h2>Accepts</h2>
 
                 <tr>
                     <td width="20%"><strong>Office Zip Code</strong></td>
@@ -1775,7 +1707,7 @@ function physician_edit()
           <!--<td><?php echo $cfcms_list['password'] ?></td>-->
           <td><?php echo $cfcms_list['name'] ?></td>
           <td><?php echo $cfcms_list['specialty'] ?></td>
-          <td><img src="<?php if(!empty($cfcms_list['image'])): ?><?php echo $cfcms_list['image']; else: ?>https://collinfannincms.com/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>" width="70" /></td>
+          <td><img src="<?php if(!empty($cfcms_list['image'])): ?><?php echo $cfcms_list['image']; else: ?>https://collinfannincms.org/wp-content/uploads/2015/08/CFCMS_defaultpic-740x830.jpg<?php endif; ?>" width="70" /></td>
           <!--<td><?php echo $cfcms_list['practice_name'] ?></td>-->
           <td><?php echo $cfcms_list['office_city'] ?></td>
           <td><?php echo $cfcms_list['office_state'] ?></td>
@@ -1912,6 +1844,8 @@ function init_remove_support(){
     $post_type = 'videos';
     remove_post_type_support( $post_type, 'editor');
 }
+
+
 
 
 ?>

@@ -5,7 +5,7 @@ Plugin URI: https://wpgogo.com/development/custom-field-template.html
 Description: This plugin adds the default custom fields on the Write Post/Page.
 Author: Hiroaki Miyashita
 Author URI: https://wpgogo.com/
-Version: 2.4.9
+Version: 2.5.4
 Text Domain: custom-field-template
 Domain Path: /
 */
@@ -15,7 +15,7 @@ This program is based on the rc:custom_field_gui plugin written by Joshua Sigar.
 I appreciate your efforts, Joshua.
 */
 
-/*  Copyright 2008 -2019 Hiroaki Miyashita
+/*  Copyright 2008 - 2021 Hiroaki Miyashita
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ class custom_field_template {
 		add_action( 'add_meta_boxes', array(&$this, 'custom_field_template_add_meta_boxes') );
 		add_action( 'edit_form_advanced', array(&$this, 'custom_field_template_edit_form_advanced') );
 		add_action( 'edit_page_form', array(&$this, 'custom_field_template_edit_form_advanced') );
+		add_action( 'block_editor_meta_box_hidden_fields', array( &$this, 'custom_field_template_edit_form_advanced' ) );
 		
 		//add_action( 'edit_post', array(&$this, 'edit_meta_value'), 100 );
 		add_action( 'save_post', array(&$this, 'edit_meta_value'), 100, 2 );
@@ -747,7 +748,7 @@ class custom_field_template {
 	}
 	
 	function custom_field_template_admin_scripts() {
-		global $post;
+		global $post, $wp_version;
 		$options = $this->get_custom_field_template_data();
 		$locale = get_locale();
 
@@ -757,8 +758,11 @@ class custom_field_template {
 			$plugin_dir = dirname( plugin_basename(__FILE__) );
 		
 		wp_enqueue_script( 'jquery' );
+		if ( substr($wp_version, 0, 3) >= '5.5' ) :
+			wp_enqueue_script( 'jquery-migrate', '/'.PLUGINDIR.'/'.$plugin_dir.'/jquery-migrate-1.4.1.min.js', array('jquery'));
+		endif;
 		wp_enqueue_script( 'jquery-form' );
-		wp_enqueue_script( 'bgiframe', '/' . PLUGINDIR . '/' . $plugin_dir . '/js/jquery.bgiframe.js', array('jquery') ) ;
+		//wp_enqueue_script( 'bgiframe', '/' . PLUGINDIR . '/' . $plugin_dir . '/js/jquery.bgiframe.js', array('jquery') ) ;
 		if (strpos($_SERVER['REQUEST_URI'], 'custom-field-template') !== false ) 
 			wp_enqueue_script( 'textarearesizer', '/' . PLUGINDIR . '/' . $plugin_dir . '/js/jquery.textarearesizer.js', array('jquery') );
 		if( strstr($_SERVER['REQUEST_URI'], 'wp-admin/post-new.php') || strstr($_SERVER['REQUEST_URI'], 'wp-admin/post.php') || strstr($_SERVER['REQUEST_URI'], 'wp-admin/page-new.php') || strstr($_SERVER['REQUEST_URI'], 'wp-admin/page.php') || strstr($_SERVER['REQUEST_URI'], 'wp-admin/edit.php') || (is_object($post) && $post->post_type=='page') ) :
@@ -1137,7 +1141,12 @@ type = file';
 			$plugin_dir = dirname( plugin_basename(__FILE__) );
 ?>
 <style type="text/css">
-#poststuff h3								{ font-size: 14px; line-height: 1.4; margin: 0; padding: 8px 12px; }
+.postbox.closed { border-bottom:1px solid #ccd0d4; }
+.postbox .handlediv { display: block; float: right; width: 36px; height: 36px; margin: 0; padding: 0; border: 0; background: 0 0; cursor: pointer; }
+.postbox.closed .handlediv::before { content: '\f140'; }
+.postbox .handlediv::before { content: '\f142'; }
+.postbox .handlediv::before { font: normal 20px/1 'dashicons'; display: inline-block; padding: 8px 10px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-decoration: none !important; }
+#poststuff h3 { font-size: 14px; line-height: 1.4; margin: 0; padding: 8px 12px; }
 div.grippie {
 background:#EEEEEE url(<?php echo '../' . PLUGINDIR . '/' . $plugin_dir . '/js/'; ?>grippie.png) no-repeat scroll center 2px;
 border-color:#DDDDDD;
@@ -2007,7 +2016,7 @@ jQuery(this).addClass("closed");
 
 		if( isset( $post_id ) && $post_id > 0 && $_REQUEST['default'] != true ) {
 			$selected = $this->get_post_meta( $post_id, $title );
-			$ct_value = count($selected);
+			$ct_value = is_array($selected) ? count($selected) : 0;
 			$selected = isset($selected[ $cftnum ]) ? $selected[ $cftnum ] : '';
 		} else {
 			$selected = stripslashes($default);
@@ -2100,7 +2109,7 @@ jQuery(this).addClass("closed");
 
 		if( isset( $post_id ) && $post_id > 0 && $_REQUEST['default'] != true ) {
 			$selected = $this->get_post_meta( $post_id, $title );
-			$ct_value = count($selected);
+			$ct_value = is_array($selected) ? count($selected) : 0;
 			$selected = isset($selected[ $cftnum ]) ? $selected[ $cftnum ] : '';
 		} else {
 			$selected = stripslashes($default);
@@ -2608,7 +2617,7 @@ jQuery(this).addClass("closed");
 					
 						if ( isset($data['multipleButton']) && $data['multipleButton'] == true ) :
 							$addfield .= ' <span>';
-							if ( isset($post_id) ) $addbutton = $this->get_post_meta( $post_id, $title, true )-1;
+							if ( isset($post_id) ) $addbutton = (int)$this->get_post_meta( $post_id, $title, true )-1;
 							if ( !isset($addbutton) || $addbutton<=0 ) $addbutton = 0;
 							if ( $data['cftnum']/2 == $addbutton ) :
 								if ( substr($wp_version, 0, 3) < '3.3' ) :
@@ -3049,7 +3058,10 @@ jQuery("#edButtonPreview").trigger("click"); }' . "\n";*/
 		if( !current_user_can('edit_post', $id) )
 			return $id;
 								
-		if( isset($_REQUEST['custom-field-template-verify-key']) && !wp_verify_nonce($_REQUEST['custom-field-template-verify-key'], 'custom-field-template') )
+		if ( empty($_REQUEST['custom-field-template-verify-key']) )
+			return $id;
+								
+		if( !wp_verify_nonce($_REQUEST['custom-field-template-verify-key'], 'custom-field-template') )
 			return $id;
 
 		if ( !empty($_POST['wp-preview']) && $id != $post->ID ) :
@@ -3293,7 +3305,7 @@ jQuery("#edButtonPreview").trigger("click"); }' . "\n";*/
 		if ($Temp = strtok($Str,"\r\n")) {
 			$sn = -1;
 			do {
-				switch ($Temp{0}) {
+				switch ($Temp[0]) {
 					case ';':
 					case '#':
 						break;

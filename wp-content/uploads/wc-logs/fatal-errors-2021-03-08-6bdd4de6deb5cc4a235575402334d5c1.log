@@ -1,0 +1,4 @@
+2021-03-08T14:37:28+00:00 CRITICAL syntax error, unexpected end of file in /Applications/MAMP/htdocs/collin_fannin/wp-content/themes/grace-church/fw/core/core.shortcodes/shortcodes.php on line 4146
+
+2021-03-08T20:26:51+00:00 CRITICAL syntax error, unexpected 'endforeach' (T_ENDFOREACH) in /Applications/MAMP/htdocs/collin_fannin/wp-content/themes/grace-church/add-vendor-review.php on line 217
+

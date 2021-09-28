@@ -1,0 +1,29 @@
+<script>
+    jQuery(document).ready( function($) {
+        $('#login_form').submit(function(e) {
+
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+
+            var form = $(this);
+            var url = form.attr('action');
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: form.serialize(),
+                success: function(data)
+                {
+                    if(data == 'login not successful') {jQuery('#password_failed').css('display','none');jQuery('#login_failed').css('display','block')}
+                    else if(data == 'password not successful') {jQuery('#login_failed').css('display','none');jQuery('#password_failed').css('display','block')}
+                    else {window.location.replace('http://localhost:8888/collin_fannin/cfcms-directory');}
+                }
+            });
+        });
+        $("#gototop").on("click", function() {
+            $(window).scrollTop(0);
+        });
+        $("#rating_2517").starRating({initialRating: 5,starSize: 25});$("#rating_2502").starRating({initialRating: 4,starSize: 25});
+    });
+</script>
+
+

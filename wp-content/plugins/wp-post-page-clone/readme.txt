@@ -1,10 +1,10 @@
 === WP Post Page Clone ===
 Contributors: gaurangsondagar
 Donate link: http://gaurangsondagar99.wordpress.com/
-Tags: clone post, clone page, duplicate post, duplicate page, clone post and page, duplicate post and page, post, posts, page, pages
+Tags: clone post, clone page, duplicate post, duplicate page, clone post and page, duplicate post and page
 Requires at least: 4.0
-Tested up to: 5.2.2
-Stable tag: 1.0
+Tested up to: 5.5.3
+Stable tag: 1.1
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,3 +49,7 @@ WP Post Page Clone Plugin Features
 1. screenshot-1.png
 
 == Changelog ==
+
+= 1.1 (10th May, 2020) =
+
+* Security issues fixes addressed by Securi

@@ -152,8 +152,8 @@ global $GRACE_CHURCH_GLOBALS;
                                         <?php if (!empty($address_1)) echo ('<span class="icon-location"></span>') . '  ' .($address_1); ?>
                                     </div>
 									<div class="address address_center">
-										<?php if (!empty($phone)) echo ('<span class="icon-phone"></span>') . '  ' . ($phone) ; ?>
-										<?php if (!empty($fax)) echo ('<br/><span class="icon-print"></span>') . '  ' . ($fax) ; ?>
+										<?php if (!empty($phone)) echo ('<span class="icon-phone"></span>') . '  <a style="color: #fff" href="tel: '.$phone.' ">' . ($phone).'</a>' ; ?>
+										<?php if (!empty($fax)) echo ('<br/><span class="icon-print"></span>') . '  <a style="color: #fff">' . ($fax).'</a>' ; ?>
 									</div>
                                     <div class="address address_right">
                                         <span><?php if (!empty($contact_open_hours)) echo ($contact_open_hours) ; ?></span>
@@ -179,10 +179,19 @@ global $GRACE_CHURCH_GLOBALS;
 			// Copyright area
 			$copyright_style = grace_church_get_custom_option('show_copyright_in_footer');
 			if (!grace_church_param_is_off($copyright_style)) {
-			?> 
-				<div class="copyright_wrap copyright_style_<?php echo esc_attr($copyright_style); ?>  scheme_<?php echo esc_attr(grace_church_get_custom_option('copyright_scheme')); ?>">
-					<div class="copyright_wrap_inner">
-						<div class="content_wrap">
+			?>
+                <footer class="footer_wrap call_to_action scheme_original " style="background-color: #effdff;">
+                    <div class="call_to_action_inner content_wrap">
+                        <ul class="menu_main_nav" style="padding-bottom:15px;padding-top:20px;display:table;margin:auto">
+                            <li style="list-style:none"><a style="color:#6e6a6b" href="https://collinfannincms.org">HOME</a></li>
+                            <li style="list-style:none"><a style="color:#6e6a6b" href="http://www.pacollincounty.org" target="_blank">SEARCH BEST OF</a></li>
+                            <li style="list-style:none"><a  style="color:#6e6a6b" href="http://www.collincountytx.gov/healthcare_services/Pages/default.aspx" target="_blank">WHY JOIN BEST OF?</a></li>
+                        </ul>
+                    </div>	<!-- /.footer_wrap_inner -->
+                </footer>
+                <div class="copyright_wrap copyright_style_<?php echo esc_attr($copyright_style); ?>  scheme_<?php echo esc_attr(grace_church_get_custom_option('copyright_scheme')); ?>">
+					<div class="copyright_wrap_inner" style="background-color: #003D89">
+						<div class="content_wrap" style="text-align: center">
 							<?php
 							if ($copyright_style == 'menu') {
 								if (empty($GRACE_CHURCH_GLOBALS['menu_footer']))	$GRACE_CHURCH_GLOBALS['menu_footer'] = grace_church_get_nav_menu('menu_footer');
@@ -288,7 +297,7 @@ else {
         </div>
         
         <div style="background-position:right center;background-repeat:no-repeat;width:48%;float:right;height:54px;line-height:50px;padding-right:10px;background-position:98%;font-size:20px;padding-top:5px;">
-            <a href="mailto:scb@collinfannincms.com" style="color:#FFF">Email Us</a>
+            <a href="mailto:scb@collinfannincms.org" style="color:#FFF">Email Us</a>
         </div>
     </div>
 <?php endif; ?>

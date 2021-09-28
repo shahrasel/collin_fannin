@@ -28,8 +28,9 @@ if ( !function_exists( 'grace_church_template_testimonials_2_output' ) ) {
         //$parts = explode('_', $post_options['layout']);
         //$style = $parts[0];
         //$columns = max(1, min(12, empty($parts[1]) ? (!empty($post_options['columns_count']) ? $post_options['columns_count'] : 1) : (int) $parts[1]));
-        $mydb = new wpdb('admin_coll','^8faX99z','admin_collin','localhost:8888');
-        $testimonial_lists1 = $mydb->get_results("select * from ".$wpdb->prefix."testimonials where doctor_id = '".$_GET['id']."' order by ID desc",'ARRAY_A');
+        $mydb = new wpdb('collinorg_user','^8faX99z','collinorg','localhost:8888');
+        //$mydb = new wpdb('root','root','collin','localhost:8888');
+        $testimonial_lists1 = $mydb->get_results("select * from ".$wpdb->prefix."bestof_reviews where vendor_id = '".$_GET['id']."' order by ID desc",'ARRAY_A');
         //$columns = max(1, min(12, empty($parts[1]) ? (!empty(count($testimonial_lists1)) ? count($testimonial_lists1) : 1) : (int) $parts[1]));
         ?>
 

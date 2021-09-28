@@ -3,8 +3,8 @@ Contributors: Hiroaki Miyashita
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WN7Y2442JPRU6
 Tags: custom field, custom fields, custom, fields, field, template, meta, custom field template, custom post type, acf, advanced
 Requires at least: 2.1
-Tested up to: 5.2.3
-Stable tag: 2.4.9
+Tested up to: 5.6
+Stable tag: 2.5.4
 License: GPLv2 or later
 
 The Custom Field Template plugin extends the functionality of custom fields.
@@ -113,6 +113,22 @@ See the default template and modify it.
 4. Auto Hook of `the_content()` in the option page of this plugin may help you do this. You can use [cft] shortcodes here. You can switch the cft formats in each category.
 
 == Changelog ==
+
+= 2.5.4 =
+* Code cleaning.
+
+= 2.5.3 =
+* WordPress 5.6.
+
+= 2.5.2 =
+* Security fix.
+
+= 2.5.1 =
+* WordPress 5.5.
+* Code cleaning.
+
+= 2.5 =
+* Code cleaning.
 
 = 2.4.9 =
 * Bugfix: Auto Hook of `the_content()`.

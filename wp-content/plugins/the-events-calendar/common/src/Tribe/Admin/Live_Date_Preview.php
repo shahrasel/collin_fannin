@@ -3,19 +3,35 @@
  * Facilitiates live date previews in the Events > Settings > Display admin screen.
  */
 class Tribe__Admin__Live_Date_Preview {
-	protected $target_fields = array(
+	protected $target_fields = [
 		'dateWithYearFormat',
 		'dateWithoutYearFormat',
 		'monthAndYearFormat',
 		'weekDayFormat',
-	);
+	];
+
+	/**
+ 	 * Static Singleton Holder
+	 *
+	 * @var self
+	 */
+	protected static $instance;
+
+	/**
+	 * Static Singleton Factory Method
+	 *
+	 * @return self
+	 */
+	public static function instance() {
+		return self::$instance ? self::$instance : self::$instance = new self;
+	}
 
 	/**
 	 * Adds live date previews to the display settings tab (nothing is setup unless
 	 * the user is actually on that tab).
 	 */
 	public function __construct() {
-		add_action( 'tribe_settings_after_do_tabs', array( $this, 'listen' ) );
+		add_action( 'tribe_settings_after_do_tabs', [ $this, 'listen' ] );
 	}
 
 	/**
@@ -34,8 +50,10 @@ class Tribe__Admin__Live_Date_Preview {
 		 */
 		$this->target_fields = (array) apply_filters( 'tribe_settings_date_preview_fields', $this->target_fields );
 
-		add_filter( 'tribe_field_div_end', array( $this, 'setup_date_previews' ), 10, 2 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'live_refresh_script' ) );
+		add_filter( 'tribe_field_div_end', [ $this, 'setup_date_previews' ], 10, 2 );
+
+		// We are still before `admin_enqueue_scripts` making it safe to use `tribe_asset`
+		tribe_asset( Tribe__Main::instance(), 'tribe-date-live-refresh', 'admin-date-preview.js', [ 'jquery' ], 'admin_enqueue_scripts' );
 	}
 
 	public function setup_date_previews( $html, $field ) {
@@ -46,13 +64,5 @@ class Tribe__Admin__Live_Date_Preview {
 
 		$preview = esc_html( date_i18n( $field->value ) );
 		return " <code class='live-date-preview'> $preview </code> $html";
-	}
-
-	/**
-	 * Enquues a script to handle live refresh of the date previews.
-	 */
-	public function live_refresh_script() {
-		$url = Tribe__Template_Factory::getMinFile( tribe_resource_url( 'admin-date-preview.js', false, 'common' ), true );
-		wp_enqueue_script( 'tribe-date-live-refresh', $url, array( 'jquery' ), false, true );
 	}
 }

@@ -3629,7 +3629,7 @@ body.body_style_wide .sc_parallax .sc_parallax_content{
 }
 .sc_testimonials_style_testimonials-3 .sc_testimonial_content {
 	padding: 1em 1em 1em 3em;
-	background-color:#ffffff;
+	/*background-color:#ffffff;*/
 	text-align:left;
 	position:relative;
 	margin-bottom:1em;
@@ -3642,10 +3642,10 @@ body.body_style_wide .sc_parallax .sc_parallax_content{
 	height: 0.8em;
 	right: 1em;
 	bottom:-0.4em;
-	background-color:#ffffff;
+	/*background-color:#ffffff;
 	-webkit-transform:rotate(45deg);
 	   -moz-transform:rotate(45deg);
-	        transform:rotate(45deg);
+	        transform:rotate(45deg);*/
 }
 .sc_testimonials_style_testimonials-3 .sc_testimonial_content p:first-child:before {
 	content: '\e8b6';

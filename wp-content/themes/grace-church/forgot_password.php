@@ -7,13 +7,13 @@
  * @package xs
  */
 $flag = 0;
-function set_html_content_type() {
+/*function set_html_content_type() {
 	return 'text/html';
-}
+}*/
 if(!empty($_POST)) {
 	
 	$url = 'https://www.google.com/recaptcha/api/siteverify';
-	$privatekey = '6LdiZx4TAAAAAMzcaIc5l0R-DWjvP1cZvM8YYhww';	
+	$privatekey = '6LfDt0saAAAAABvWWkoOskO4qpZk2IbSjgU7E5K5';
 	$response = file_get_contents($url."?secret=".$privatekey."&response=".$_POST['g-recaptcha-response']."&remoteip=".$_SERVER['REMOTE_ADDR']);
 	$data = json_decode($response);
 	
@@ -24,19 +24,23 @@ if(!empty($_POST)) {
 		global $wpdb;
 		$cfcms_info = $wpdb->get_row("select password from ".$wpdb->prefix."cfcms_directory where `office_email` = '".$_POST['email']."'",'ARRAY_A');		
 		
-		
-		$message = 'Your password is:<br/>';
-		$message .= '<b>'.$cfcms_info['password'].'</b>';
-		
-		
-		$email = get_option( 'admin_email' );
-		$headers = 'From: Collin Fannin <'.$_POST['email'].'>' . "\r\n";
-		
-		add_filter( 'wp_mail_content_type', 'set_html_content_type' );
-		wp_mail( $_POST['email'], 'Forgot Password Email', $message,$headers); 
-		remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
-		$flag = 1;
-		$_POST = array();
+		if(!empty($cfcms_info)) {
+            $message = 'Your password is:<br/>';
+            $message .= '<b>' . $cfcms_info['password'] . '</b>';
+
+
+            $email = get_option('admin_email');
+            $headers = 'From: Collin Fannin <' . $_POST['email'] . '>' . "\r\n";
+
+            add_filter('wp_mail_content_type', 'set_html_content_type');
+            wp_mail($_POST['email'], 'Forgot Password Email', $message, $headers);
+            remove_filter('wp_mail_content_type', 'set_html_content_type');
+            $flag = 1;
+            $_POST = array();
+        }
+		else {
+		    $flag = 3;
+        }
 	}
 	else {
 		$flag = 2;
@@ -109,10 +113,14 @@ get_header();
       
       <input type="hidden" name="formsub" value="1">
       
-      <div class="g-recaptcha" data-sitekey="6LdiZx4TAAAAALexHX1xPL0K1mtl-968nW7LIu6k"></div>
+      <div class="g-recaptcha" data-sitekey="6LfDt0saAAAAALIWCm2nqPRNSgjG6YUqWPZU_RPD"></div>
       
       <?php if($flag == 2): ?>
 	      <p style="background-color:#ff0000;color:#fff;padding-left:10px">Failed! Please confirm that you are not a robot!</p>
+      <?php endif; ?>
+
+      <?php if($flag == 3): ?>
+          <p style="background-color:#ff0000;color:#fff;padding-left:10px">Please confirm that you are a valid user.</p>
       <?php endif; ?>
       
       <div class="sc_contact_form_item sc_contact_form_button" style="margin-top:20px;margin-left:0px;">

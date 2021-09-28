@@ -737,7 +737,7 @@ Very common low res
     .row.columns_fluid > .column-3_6, .columns_wrap.columns_fluid > .column-3_6,
     .row.columns_fluid > .column-4_6, .columns_wrap.columns_fluid > .column-4_6,
     .row.columns_fluid > .column-5_6, .columns_wrap.columns_fluid > .column-5_6	{
-        width:100%;
+        width:75%;
     }
     .row:not(.columns_fluid) > [class*="column-"]+[class*="column-"], .columns_wrap:not(.columns_fluid) > [class*="column-"]+[class*="column-"],
     .row.columns_fluid > [class*="column-"]:nth-child(2n+3), .columns_wrap.columns_fluid > [class*="column-"]:nth-child(2n+3),
@@ -909,7 +909,7 @@ Very common low res
 
     /* Registration popup */
     .popup_wrap#popup_login {
-        left: -9rem;
+        left: -16rem;
     }
     .popup_wrap {
         width: 230px;

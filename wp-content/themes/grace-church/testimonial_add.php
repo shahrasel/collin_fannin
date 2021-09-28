@@ -1,10 +1,5 @@
 <?php
 session_start();
-if(empty($_SESSION['ses_user'])) {
-    $_SESSION['adminuser'] = '';
-    header('Location:'.site_url());
-    exit;
-}
 //ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);
 if(!empty($_POST)) {
     global $wpdb;
@@ -41,11 +36,11 @@ if(!empty($_SESSION['ses_user'])):
 
 
 	<div class="sc_contact_form_wrap" style="margin-bottom:40px">
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/appointment-requests"><button>Appointment Requests</button></a>&nbsp;&nbsp;
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/testimonials"><button style="background-color: #ff9279">Testimonials</button></a>
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="https://physicianfinder.collinfannincms.com/wp-content/uploads/2020/01/CollinFannin2019Dir_web.pdf" target="_blank"><button>Electronic Directory</button></a>&nbsp;&nbsp;
-        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url().'/videos'; ?>"><button>Videos</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/cfcms-directory"><button>My Profile</button></a>
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/appointment-requests"><button >Appointment Requests</button></a>&nbsp;&nbsp;
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url() ?>/testimonials"><button style="background-color: #ff9279">Testimonials</button></a>
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="http://www.emconsultinginc.com/Digital_Publications/CollinFannin/md_2016/"><button>Electronic Directory</button></a>&nbsp;&nbsp;
+        <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url().'/videos'; ?>"><button>Videos</button></a>&nbsp;&nbsp;
         <a style="color:#fff;margin: 10px 0px;display: inline-block" href="<?php echo site_url().'?logout=true'; ?>"><button>Logout</button></a>
     </div>
 

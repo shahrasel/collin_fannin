@@ -54,11 +54,11 @@ if ( !function_exists( 'grace_church_template_header_4_output' ) ) {
 
 			<div class="top_panel_middle" <?php echo ($header_css); ?>>
 				<div class="content_wrap">
-					<div class="columns_wrap columns_fluid"><div
-						class="column-1_4 contact_logo">
+					<div class=""><div
+						class="column-1_4" style="float:left;">
 							<?php require_once( grace_church_get_file_dir('templates/headers/_parts/logo.php') ); ?>
 						</div><div 
-						class="column-3_4 menu_main_wrap" style="padding-right:0px">
+						class="column-3_4" style="padding-right:0px;float: left;text-align: right;">
 							<a href="#" class="menu_main_responsive_button icon-menu"></a>
 							<nav role="navigation" class="menu_main_nav_area">
 								<?php

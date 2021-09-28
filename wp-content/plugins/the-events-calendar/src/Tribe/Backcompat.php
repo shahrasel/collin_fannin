@@ -15,10 +15,10 @@ class Tribe__Events__Backcompat {
 	 * Set up any needed hooks for methods in this class
 	 */
 	public function add_hooks() {
-		add_filter( 'tribe_get_single_option', array( $this, 'filter_multiday_cutoff' ), 10, 3 );
-		add_filter( 'tribe_get_single_option', array( $this, 'filter_default_view' ), 10, 3 );
-		add_filter( 'tribe_get_single_option', array( $this, 'filter_enabled_views' ), 10, 3 );
-		add_action( 'parse_query', array( $this, 'change_qv_to_list' ), 45 );
+		add_filter( 'tribe_get_single_option', [ $this, 'filter_multiday_cutoff' ], 10, 3 );
+		add_filter( 'tribe_get_single_option', [ $this, 'filter_default_view' ], 10, 3 );
+		add_filter( 'tribe_get_single_option', [ $this, 'filter_enabled_views' ], 10, 3 );
+		add_action( 'parse_query', [ $this, 'change_qv_to_list' ], 45 );
 	}
 
 
@@ -72,13 +72,14 @@ class Tribe__Events__Backcompat {
 	 * @return array
 	 */
 	public function filter_enabled_views( $enabled_views, $default, $option ) {
-		if ( $option == 'tribeEnableViews' ) {
-			foreach ( $enabled_views as &$view ) {
-				if ( $view == 'upcoming' ) {
-					$view = 'list';
-				}
+		if ( 'tribeEnableViews' === $option ) {
+			if ( ! ( ! empty( $enabled_views ) && in_array( 'upcoming', $enabled_views ) ) ) {
+				return $enabled_views;
 			}
+
+			$enabled_views[ array_search( 'upcoming', $enabled_views ) ] = 'list';
 		}
+
 		return $enabled_views;
 	}
 
